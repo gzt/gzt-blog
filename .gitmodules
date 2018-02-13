@@ -1,4 +1,3 @@
 [submodule "public"]
 	path = public
 	url = git@github.com:gzt/gzt.github.io.git
-	branch = master

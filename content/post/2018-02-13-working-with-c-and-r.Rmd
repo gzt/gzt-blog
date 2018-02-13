@@ -1,0 +1,91 @@
+---
+title: Working with C and R
+author: gzt
+date: '2018-02-13'
+slug: working-with-c-and-r
+categories:
+  - R
+  - C
+tags:
+  - R
+  - C
+  - optimization
+  - profiling
+---
+
+#### or: adventures with `.Call`
+
+Generally I work either in R or in C but not both. My research is trying to do some big things faster and there's existing code in C that I'm working with. I might dump some output and then explore it in R, but I don't need to interface between them. On the other hand, when consulting with others  it's going to come down to good old-fashioned statistics so that happens in R (or SAS if applicable, for some things it's better and for some things the people you're working with are using SAS).  Still, it's something I should figure out how to do, and an opportunity to do so came up in a package I'm writing, so I'm going to put some of my notes in here in case you ever have the need to do so. Much of it is documented well elsewhere.
+
+```{r plot, echo=F}
+df <- data.frame(x = rnorm(40), group = rep(c("A","B"), 20), error = rnorm(40))
+df$y = 5 * df$x - 6 * (df$group == "A") * df$x + 2 * df$error
+#lmobj.A <- lm(y~x, data=df[df$group=="A",])
+#lmobj.B <- lm(y~x, data=df[df$group=="B",])
+plot(y~x,col=group,data=df, lwd=2, main="Easy to make in R, not C")
+
+```
+
+## Prerequisites
+
+Great, so here we are, talking about the `.Call()` interface to R.
+
+ - First, I would note that you should not do this unless it makes sense to. `Rcpp` is easier and better. The links I am about to give in the next point will warn you about this, and they are completely correct. Believe them. It only makes sense if you have a lot of existing C code to port or you have a little thing that is already in C.
+ - [R's C interace](http://adv-r.had.co.nz/C-interface.html) by Hadley Wickham. Read it very carefully, especially his warnings about how painful it is to do this and how you can avoid it. **It's true, all of it**. I have little to add except my notes about using this process. 
+ - [cjgeyer's mat package](https://github.com/cjgeyer/mat) shows a complete example of using the `.C()` interface (without registration), look at its examples. The `.Call()` interface is a little more work.
+ - [The R Documentation](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Registering-native-routines), specifically this section on R extensions, particularly the bit about registering native routines.
+ - You should be working in the context of a package, be running `devtools`, and all that (including `roxygen2`). If you're not, I presume you know what you're doing. 
+ - My warnings about doing this aside, `.Call()` is a better interface than `.C()` for anything substantial, if you do in fact have to do anything in C. For small functions, `.C()` is probably fine and using the package `inline` is probably good - I have no experience with it.
+ 
+ 
+ 
+ ## Motivation
+ 
+ Generating multivariate $t$-distributions and specifically matrix variate $t$-distributions involves making random Wishart matrices, computing a Cholesky decomposition, and finding an inverse. Generating random Wishart matrices starts by generating the Cholesky decomposition $L$ and then computing $LL^T$. Obviously it's faster just to take $L$ in the first place (or $L^{-1}$. If this were in an R function, that would be easy to modify. But, alas, inspecting the code of `rWishart` indicates that it's calling a C function. The [C function](https://github.com/SurajGupta/r-source/blob/master/src/library/stats/src/rWishart.c) is pretty straightforward, it seems, if you know C, though the `SEXP` struct is a landmine. An excellent opportunity for giving things a whirl. This will only need some minor modifications.
+ 
+The first thing to note in the code is this:
+
+```{r showcode, eval=FALSE}
+static double
+*std_rWishart_factor(double nu, int p, int upper, double ans[])
+```
+
+This function (which generates a "standard" Cholesky decomposition of a Wishart r.v.) is not exported. Otherwise, we could just pull it into R and have an easier time. Or call it into our C function and be done. So our source code will have to steal it directly. Thank the heavens for the GPL. Maybe there's a better solution. Let me know.
+
+Here are some modifications and some points I won't discuss in detail:
+
+ - I remove the "stats" headers and the references to `_()`. I did error-checking at the R input stage as well because `testthat` seemed not to like that the errors were coming from the C function instead of the R function when I test invalid input. 
+ - If you are not familiar with using LAPACK, google the function names and take note of how they are used in C.
+ - It seems the idiomatic way to work with a `SEXP` object is to work with pointers to it, that is what the 
+ `ansp = REAL(ans);` line is doing. `ansj` is then doing the same to `ansp` on only the matrix slice at that point in the loop. It's very nice. Don't try to work directly with `ans`, it will blow up on you.
+ 
+Make the necessary changes to get C to do what you want, give the C file an appropriate name in your `src/` folder in the package, make the `Makevars` file (see linked documentation above for details, not much is needed), and write a wrapper function (like `rWishart` in R, except be sure to specify your package) and, you should be ready to build. Be sure to include `@useDynLib packagename` in the `roxygen` block so that your NAMESPACE file is updated properly and all that.
+
+By the way, here is what a minimal R function without error checking looks like (you should validate the input):
+
+```{r showsecond, eval=FALSE}
+rCholWishart <- function(n, df, Sigma){
+  Sigma <- as.matrix(Sigma)
+  .Call("rCholWishart", n, df, Sigma, PACKAGE = "matrixdist")
+}
+```
+
+Here is what [my C file](https://github.com/gzt/matrixdist/blob/master/src/rCholWishart.c) looks like. At this point, you should confirm that your package builds without errors and you can call your C function from the R wrapper function in your package. It should warn about registration. The part that seems a little underdocumented and gave me the most trouble is the registration part. 
+
+I beat myself up for a few hours trying to create my own registration routine by hand based on examples elsewhere. Most people aren't giving examples of registering multiple functions with `R_CallMethodDef` and `R_registerRoutines` so trying to imitate them is fraught with danger. It turns out there's a handy function to generate the necessary code: `tools::package_native_routine_registration_skeleton()` - be sure to specify an argument for `con=""` other than `stdout()`. I made the file into `init.c` and put it in the `src/` folder. That does it if you have everything else all ready - the functions, the documentation, etc. 
+ 
+ The final step is making sure you included a `.onUnload()` function properly in your code. Simply put, somewhere in your code, add this (change to the name of your package):
+ 
+ ```{r unload, eval=F}
+ 
+.onUnload <- function(libpath) {
+  library.dynam.unload("matrixdist", libpath)
+}
+ 
+ ```
+ 
+ Maybe there's a better way of doing that. Nobody seems to say what, though.
+ 
+ ## Conclusion
+ 
+ Don't use C with R. Use `Rcpp` if you can. If you must use C, read the documentation above (especially Hadley's), imitate existing code, do it in a package so it's done right, document it properly so it's done right, and use `tools::package_native_routine_registration_skeleton()` to generate the registration code. 
