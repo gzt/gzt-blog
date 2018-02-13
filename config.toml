@@ -88,10 +88,6 @@ weight = -10
 identifier = "repository"
 url = "https://github.com/gzt/"
 
-[[menu.main]]
-name = "About"
-weight = 2
-url = "/about/"
 
 [[menu.main]]
     name = "Categories"
