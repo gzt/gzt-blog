@@ -1,0 +1,18 @@
+[about]
+title = ""
+description = ""
+logo = "2553342.jpg"
+
+[recent_posts]
+title = ""
+length = 5
+excludeTypes = ["page"]
+
+[social_menu]
+title = ""
+platforms = ["github","twitter","email","linkedin"]
+
+[taxonomy_cloud]
+title = ""
+taxonomy = "tags"
+shuffle = true

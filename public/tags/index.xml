@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on geoff thompson</title>
+    <link>/tags/</link>
+    <description>Recent content in Tags on geoff thompson</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Mon, 12 Feb 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Linear algebra</title>
+      <link>/tags/linear-algebra/</link>
+      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/linear-algebra/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Optimization</title>
+      <link>/tags/optimization/</link>
+      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/optimization/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Profiling</title>
+      <link>/tags/profiling/</link>
+      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/profiling/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R</title>
+      <link>/tags/r/</link>
+      <pubDate>Mon, 12 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/r/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
