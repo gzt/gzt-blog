@@ -1,6 +1,6 @@
 ---
 title: About
-description: about the author
+description: 
 menu: main
 date: '2018-02-12'
 weight: -210
@@ -16,7 +16,8 @@ look like, really. I also enjoyed working with the statistical consulting group
 for a couple years, since other people's problems are more interesting than my own, 
 as that means I would work on the part that's interesting to me and 
 they would work on the part that's interesting to them, then they would get to do the 
-hard work of finishing the project and writing.
+hard work of finishing the project and writing. For a moment, you feel like an expert 
+in a completely foreign field. 
 
 I also like long walks on the beach.
 
@@ -29,7 +30,7 @@ I also like long walks on the beach.
 ### Projects
  
  * `matrixdist` an R package for working with matrix variate distributions such as the matrix variate normal or matrix variate *t*-distribution.
- * Porting scalable *k*-means++ (or *k*-means||) to OpenMPI (minor work)
+ * Porting scalable *k*-means++ (or *k*-means||) to OpenMPI (a minor work).
  * In progress: a similarity metric for binomial and multinomial image comparison accounting for structural similarity.
  * In progress: a parallelization of Hartigan and Wong's k-means algorithm for OpenMPI.
  * In progress: a clustering-based image compression algorithm.
@@ -39,8 +40,8 @@ I also like long walks on the beach.
 
 ### Other activities
 
- * STATCOM - Statistics in the Community. Currently the president of the Iowa State University chapter.
+ * STATCOM - Statistics in the Community. Currently the president of the Iowa State University chapter. Provides outreach to the greater community - statistical consulting to non-profits as well as educational and informative events.
 
 ### Prior work
  
- * Human capital analyst in the HR department of Health Care Service Corporation for 5 years. Providing analytics and data-driven decision making for the Human Resources department in their consultations with internal customers. There were some cool ideas here but it made me realize that I needed a bit more formal grounding in this and decided to get a PhD in statistics as a result! 
+ * Human capital analyst in the HR department of Health Care Service Corporation for 5 years. Providing analytics and data-driven decision making for the Human Resources department in their consultations with internal customers. There were some cool ideas here but it made me realize that I needed a bit more formal grounding in this and decided to get a PhD in statistics as a result.
