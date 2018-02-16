@@ -1,0 +1,67 @@
+---
+title: Matrixdist News
+author: gzt
+date: '2018-02-16'
+slug: matrixdist-new
+categories:
+  - R
+tags:
+  - R
+  - matrixdist
+---
+
+
+
+<p>I have just finished setting up handling for AR(1) and compound symmetry variance structures in my maximum likelihood estimation function for matrix variate normal distributions in <code>matrixdist</code>. This means I may submit it to CRAN soon (it’s currently available on <a href="http://www.github.com/gzt/matrixdist">github</a>). An example:</p>
+<pre class="r"><code>library(matrixdist)
+A &lt;- rmatrixnorm(100, mean=array(0,dim=c(3,4)), U = toeplitz(c(1,.8,.64)), V = rWishart(1,7,diag(4))[,,1])
+mle.matrixnorm(A, row.variance=&quot;AR(1)&quot;)</code></pre>
+<pre><code>## $mean
+##             [,1]        [,2]       [,3]       [,4]
+## [1,]  0.23784768  0.03615944 0.05471075 0.06021446
+## [2,]  0.11782308 -0.24118414 0.17761392 0.08083905
+## [3,] -0.08252311  0.02670089 0.19728084 0.09224818
+## 
+## $U
+##           [,1]      [,2]      [,3]
+## [1,] 1.0000000 0.8103196 0.6566179
+## [2,] 0.8103196 1.0000000 0.8103196
+## [3,] 0.6566179 0.8103196 1.0000000
+## 
+## $V
+##            [,1]       [,2]        [,3]        [,4]
+## [1,]  1.0000000 -0.4742776 -0.11386443 -0.06162850
+## [2,] -0.4742776  0.6293864  0.21788460  0.11522885
+## [3,] -0.1138644  0.2178846  0.63012819  0.08896749
+## [4,] -0.0616285  0.1152289  0.08896749  0.10940708
+## 
+## $var
+## [1] 11.30457
+## 
+## $iter
+## [1] 17
+## 
+## $tol
+## [1] 8.508737e-08
+## 
+## $logLik
+## [1] -2132.22
+## 
+## $convergence
+## [1] TRUE
+## 
+## $call
+## mle.matrixnorm(data = A, row.variance = &quot;AR(1)&quot;)</code></pre>
+<p>There is a performance hit as fitting for these require calls to <code>uniroot</code> to find the zeros of the derivatives, but it is not so bad in the cases I’ve looked at.</p>
+<pre class="r"><code>library(microbenchmark)
+res&lt;-microbenchmark(
+  mle.matrixnorm(A),
+  mle.matrixnorm(A, row.variance=&quot;AR(1)&quot;),
+  mle.matrixnorm(A, row.variance=&quot;CS&quot;)
+)
+plot(res, log=&quot;y&quot;, names = c(&quot;None&quot;, &quot;AR(1)&quot;, &quot;CS&quot;), 
+     col = c(&quot;darkred&quot;,&quot;royalblue&quot;,&quot;lightyellow&quot;),
+     xlab=&quot;Variance Structure&quot;)</code></pre>
+<p><img src="/post/2018-02-16-matrixdist-new_files/figure-html/benchmarking-1.png" width="672" /></p>
+<p>I will need to think hard about whether I want to add anything else first, as nobody wants to deal with massive updates to functionality in fast succession.</p>
+<p>Here is a possible agenda: * More distributions, such as skew <span class="math inline">\(t\)</span>-distributions. I do not have much interest in matrix variate gamma distributions or beta distributions. * Tools for working with matrix variate distributions, such as adaptations for LDA-type activities or clustering. * Parameter estimation for distributions besides the normal distribution. <span class="math inline">\(t\)</span>-distributions typically require use of EM or its extensions.</p>
