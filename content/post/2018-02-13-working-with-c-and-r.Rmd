@@ -17,7 +17,8 @@ tags:
 
 Generally I work either in R or in C but not both. My research is trying to do some big things faster and there's existing code in C that I'm working with. I might dump some output and then explore it in R, but I don't need to interface between them. On the other hand, when consulting with others  it's going to come down to good old-fashioned statistics so that happens in R (or SAS if applicable, for some things it's better and for some things the people you're working with are using SAS).  Still, it's something I should figure out how to do, and an opportunity to do so came up in a package I'm writing, so I'm going to put some of my notes in here in case you ever have the need to do so. Much of it is documented well elsewhere.
 
-```{r plot, echo=F}
+```{r plot, echo=F,cache=TRUE}
+set.seed(20180213)
 df <- data.frame(x = rnorm(40), group = rep(c("A","B"), 20), error = rnorm(40))
 df$y = 5 * df$x - 6 * (df$group == "A") * df$x + 2 * df$error
 #lmobj.A <- lm(y~x, data=df[df$group=="A",])
