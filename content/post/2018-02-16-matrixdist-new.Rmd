@@ -1,0 +1,43 @@
+---
+title: Matrixdist News
+author: gzt
+date: '2018-02-16'
+slug: matrixdist-new
+categories:
+  - R
+tags:
+  - R
+  - matrixdist
+---
+
+I have just finished setting up handling for AR(1) and compound symmetry variance structures in my maximum likelihood estimation function for matrix variate normal distributions in `matrixdist`. This means I may submit it to CRAN soon (it's currently available on [github](http://www.github.com/gzt/matrixdist)).  An example:
+
+```{r matrixexample, cache=T, comment=""}
+library(matrixdist)
+A <- rmatrixnorm(100, mean=array(0,dim=c(3,4)), U = toeplitz(c(1,.8,.64)), V = rWishart(1,7,diag(4))[,,1])
+mle.matrixnorm(A, row.variance="AR(1)")
+
+```
+
+There is a performance hit as fitting for these require calls to `uniroot` to find the zeros of the derivatives, but it is not so bad in the cases I've looked at.
+
+```{r benchmarking, cache=TRUE, comment=""}
+library(microbenchmark)
+res<-microbenchmark(
+  mle.matrixnorm(A),
+  mle.matrixnorm(A, row.variance="AR(1)"),
+  mle.matrixnorm(A, row.variance="CS")
+)
+plot(res, log="y", names = c("None", "AR(1)", "CS"), 
+     col = c("darkred","royalblue","lightyellow"),
+     xlab="Variance Structure")
+```
+
+I will need to think hard about whether I want to add anything else first, as nobody wants to deal with massive updates to functionality in fast succession.
+
+Here is a possible agenda:
+
+ * More distributions, such as skew $t$-distributions. I do not have much interest in matrix variate gamma distributions or beta distributions.
+ * Tools for working with matrix variate distributions, such as adaptations for LDA-type activities or clustering.
+ * Parameter estimation for distributions besides the normal distribution. $t$-distributions typically require use of EM or its extensions.
+ * The $t$ distribution is parameterized differently between the matrix variate and multivariate cases - namely, a factor of $\nu$. I changed it to be consistent with the multivariate case, but I probably should not have done so.
