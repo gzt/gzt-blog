@@ -15,49 +15,49 @@ tags:
 <p>I have just finished setting up handling for AR(1) and compound symmetry variance structures in my maximum likelihood estimation function for matrix variate normal distributions in <code>matrixdist</code>. This means I may submit it to CRAN soon (it’s currently available on <a href="http://www.github.com/gzt/matrixdist">github</a>). An example:</p>
 <pre class="r"><code>library(matrixdist)
 A &lt;- rmatrixnorm(100, mean=array(0,dim=c(3,4)), U = toeplitz(c(1,.8,.64)), V = rWishart(1,7,diag(4))[,,1])
-mle.matrixnorm(A, row.variance=&quot;AR(1)&quot;)</code></pre>
+MLmatrixnorm(A, row.variance=&quot;AR(1)&quot;)</code></pre>
 <pre><code>$mean
-            [,1]         [,2]      [,3]      [,4]
-[1,] -0.23319124  0.101052880 0.2857941 0.2972354
-[2,] -0.10564149  0.002280582 0.1703971 0.2367385
-[3,] -0.04108313 -0.014323958 0.2020531 0.1603773
+            [,1]        [,2]        [,3]      [,4]
+[1,] -0.14927218  0.14837747 -0.12314591 0.2203576
+[2,]  0.03791425  0.00645731 -0.05735620 0.3784914
+[3,]  0.01535545 -0.08127382 -0.03381158 0.2619816
 
 $U
           [,1]      [,2]      [,3]
-[1,] 1.0000000 0.7658383 0.5865084
-[2,] 0.7658383 1.0000000 0.7658383
-[3,] 0.5865084 0.7658383 1.0000000
+[1,] 1.0000000 0.7866886 0.6188790
+[2,] 0.7866886 1.0000000 0.7866886
+[3,] 0.6188790 0.7866886 1.0000000
 
 $V
            [,1]       [,2]       [,3]       [,4]
-[1,]  1.0000000 -0.3560842  0.3014133 -0.6523897
-[2,] -0.3560842  0.5137809 -0.1149265 -0.2434573
-[3,]  0.3014133 -0.1149265  1.3517747  0.5212009
-[4,] -0.6523897 -0.2434573  0.5212009  2.3228090
+[1,]  1.0000000 -0.4236611  0.7437683 -0.3955942
+[2,] -0.4236611  2.2171441  0.1979485 -0.2037806
+[3,]  0.7437683  0.1979485  1.9569907 -1.2878996
+[4,] -0.3955942 -0.2037806 -1.2878996  2.2411468
 
 $var
-[1] 4.233963
+[1] 2.91058
 
 $iter
-[1] 13
+[1] 14
 
 $tol
-[1] 6.329479e-08
+[1] 8.02815e-08
 
 $logLik
-[1] -2094.257
+[1] -2149.492
 
 $convergence
 [1] TRUE
 
 $call
-mle.matrixnorm(data = A, row.variance = &quot;AR(1)&quot;)</code></pre>
+MLmatrixnorm(data = A, row.variance = &quot;AR(1)&quot;)</code></pre>
 <p>There is a performance hit as fitting for these require calls to <code>uniroot</code> to find the zeros of the derivatives, but it is not so bad in the cases I’ve looked at.</p>
 <pre class="r"><code>library(microbenchmark)
 res&lt;-microbenchmark(
-  mle.matrixnorm(A),
-  mle.matrixnorm(A, row.variance=&quot;AR(1)&quot;),
-  mle.matrixnorm(A, row.variance=&quot;CS&quot;)
+  MLmatrixnorm(A),
+  MLmatrixnorm(A, row.variance=&quot;AR(1)&quot;),
+  MLmatrixnorm(A, row.variance=&quot;CS&quot;)
 )
 plot(res, log=&quot;y&quot;, names = c(&quot;None&quot;, &quot;AR(1)&quot;, &quot;CS&quot;), 
      col = c(&quot;darkred&quot;,&quot;royalblue&quot;,&quot;lightyellow&quot;),

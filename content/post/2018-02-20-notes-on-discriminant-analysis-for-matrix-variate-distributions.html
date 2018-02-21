@@ -1,0 +1,62 @@
+---
+title: Notes on Discriminant Analysis for Matrix Variate Distributions
+author: gzt
+date: '2018-02-20'
+slug: notes-on-discriminant-analysis-for-matrix-variate-distributions
+categories:
+  - R
+tags:
+  - linear algebra
+  - matrixdist
+  - R
+  - classification
+  - matrix variate
+---
+
+
+
+<p>I have some brief notes for a discussion here so I’m posting them even though they’re a little incomplete because why not? Two-class classification for matrix variate normal distributions.</p>
+<div id="expected-cost-of-misclassification" class="section level2">
+<h2>Expected Cost of Misclassification</h2>
+<p><em>ECM</em> is <em>expected cost of misclassification</em>. Suppose there are two populations, <span class="math inline">\(\pi_1\)</span> and <span class="math inline">\(\pi_2\)</span> with prior probabilities of belonging to these classes, <span class="math inline">\(p_1\)</span> and <span class="math inline">\(p_2\)</span>. Define a function, <span class="math inline">\(c(1|2)\)</span> as the cost of misclassifying a member of population <span class="math inline">\(\pi_2\)</span> as a member of class <span class="math inline">\(1\)</span> (and vice versa). Further, define <span class="math inline">\(P(1|2)\)</span> as the probability of classifying a member of population <span class="math inline">\(\pi_2\)</span> as a member of class <span class="math inline">\(1\)</span> (and vice versa). Then we define the <em>expected cost of misclassification</em> as:</p>
+<p><span class="math display">\[ECM = c(2|1)P(2|1)p_1 + c(1|2)P(1|2)p_2 \]</span></p>
+</div>
+<div id="classification-rule" class="section level2">
+<h2>Classification Rule</h2>
+<p>A reasonable classification rule based on ECM is the following:</p>
+<p>Classify as class <span class="math inline">\(1\)</span> if:</p>
+<p><span class="math display">\[ \frac{f_1(x)}{f_2(x)} \geq \frac{c(1|2) p_2}{c(2|1)p_1} \]</span></p>
+<p>Where <span class="math inline">\(f_i(x)\)</span> is the probability density function for group <span class="math inline">\(\pi_i\)</span> evaluated at <span class="math inline">\(x\)</span>.</p>
+</div>
+<div id="matrix-variate-normal-populations" class="section level2">
+<h2>Matrix Variate Normal Populations</h2>
+<p>Recall the probability density function for a matrix variate normal distribution:</p>
+<p><span class="math display">\[f(\mathbf{X};\mathbf{M}, \mathbf{U}, \mathbf{V}) = \frac{\exp\left( -\frac{1}{2} \, \mathrm{tr}\left[ \mathbf{V}^{-1} (\mathbf{X} - \mathbf{M})^{T} \mathbf{U}^{-1} (\mathbf{X} - \mathbf{M}) \right] \right)}{(2\pi)^{np/2} |\mathbf{V}|^{n/2} |\mathbf{U}|^{p/2}} \]</span></p>
+<p><span class="math inline">\(\mathbf{X}\)</span> and <span class="math inline">\(\mathbf{M}\)</span> are <span class="math inline">\(n \times p\)</span>, <span class="math inline">\(\mathbf{U}\)</span> is <span class="math inline">\(n \times n\)</span> and describes the covariance relationship between the rows, and <span class="math inline">\(\mathbf{V}\)</span> is <span class="math inline">\(p \times p\)</span> and describes the covariance relationship between the columns.</p>
+</div>
+<div id="estimated-minimum-ecm-rule-for-two-matrix-variate-normal-populations" class="section level2">
+<h2>Estimated Minimum ECM Rule for Two Matrix Variate Normal Populations</h2>
+<p>A decision rule for this case:</p>
+<span class="math display">\[\begin{eqnarray} 
+R(\mathbf{X}) &amp; = &amp; \mathrm{trace}\big[ -\frac{1}{2}(\mathbf{V}_1^{-1} \mathbf{X}^{T} \mathbf{U}_1^{-1} \mathbf{X} - \mathbf{V}_2^{-1} \mathbf{X}^{T} \mathbf{U}_2^{-1} \mathbf{X}) \\
+ &amp;  &amp; +(\mathbf{V}_1^{-1} \mathbf{M}_1^{T} \mathbf{U}_1^{-1} - \mathbf{V}_2^{-1} \mathbf{M}_2^{T} \mathbf{U}_2^{-1}) \mathbf{X} \\
+ &amp;  &amp; -\frac{1}{2}(\mathbf{V}_1^{-1} \mathbf{M}_1^{T} \mathbf{U}_1^{-1} \mathbf{M}_1 - \mathbf{V}_2^{-1} \mathbf{M}_2^{T} \mathbf{U}_2^{-1} \mathbf{M}_2) \big]   \\ 
+ &amp;  &amp; -\frac{1}{2}(p (\log|\mathbf{U}_1|-\log|\mathbf{U}_2|)+ n(\log|\mathbf{V}_1|-\log|\mathbf{V}_2|) )   
+\end{eqnarray}\]</span>
+</div>
+<div id="how-to-classify-based-on-this" class="section level2">
+<h2>How to classify based on this:</h2>
+<p>If <span class="math inline">\(R(\mathbf{X}) \geq \log(c(1|2)p_2) - \log(c(2|1)p_1)\)</span>, assign <span class="math inline">\(\mathbf{X}\)</span> to group <span class="math inline">\(1\)</span>, otherwise assign to group <span class="math inline">\(2\)</span>.</p>
+<p>In the multivariate case, this is equivalent to the LDA/QDA rules - term (1) is the quadratic form which vanishes in case of equal covariances between groups, term (2) is the LDA term, and terms (3) and (4) are constants which depend on the parameters and not <span class="math inline">\(\mathrm{X}\)</span>.</p>
+<p>Typically, the models we have used have implicitly used an equal probability prior and an equal cost of misclassification, but other inputs can be specified. In case of equal priors and equal cost of misclassification, this term is 0.</p>
+</div>
+<div id="if-there-were-equal-covariances" class="section level2">
+<h2>If there were equal covariances:</h2>
+If the two groups have the same covariances, then this simplifies. The classification rule is then:
+<span class="math display">\[\begin{eqnarray} 
+R(\mathbf{X}) &amp; = &amp; \mathrm{trace}\big[ (\mathbf{V}^{-1} (\mathbf{M}_1 -\mathbf{M}_2)^{T}\mathbf{U}^{-1}) \mathbf{X} \\
+ &amp;  &amp; -\frac{1}{2}(\mathbf{V}^{-1} \mathbf{M}_1^{T} \mathbf{U}^{-1} \mathbf{M}_1 - \mathbf{V}^{-1} \mathbf{M}_2^{T} \mathbf{U}^{-1} \mathbf{M}_2) \big]    \\ 
+   &amp; \geq &amp; \log(c(1|2)p_2) - \log(c(2|1)p_1)
+\end{eqnarray}\]</span>
+<p>Classify to group <span class="math inline">\(1\)</span> if the last term is true. Note this is linear in <span class="math inline">\(\mathbf{X}\)</span>. This is directly analogous to LDA in the multivariate case.</p>
+</div>

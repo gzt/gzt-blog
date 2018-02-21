@@ -15,7 +15,7 @@ I have just finished setting up handling for AR(1) and compound symmetry varianc
 ```{r matrixexample, cache=T, comment=""}
 library(matrixdist)
 A <- rmatrixnorm(100, mean=array(0,dim=c(3,4)), U = toeplitz(c(1,.8,.64)), V = rWishart(1,7,diag(4))[,,1])
-mle.matrixnorm(A, row.variance="AR(1)")
+MLmatrixnorm(A, row.variance="AR(1)")
 
 ```
 
@@ -24,9 +24,9 @@ There is a performance hit as fitting for these require calls to `uniroot` to fi
 ```{r benchmarking, cache=TRUE, comment=""}
 library(microbenchmark)
 res<-microbenchmark(
-  mle.matrixnorm(A),
-  mle.matrixnorm(A, row.variance="AR(1)"),
-  mle.matrixnorm(A, row.variance="CS")
+  MLmatrixnorm(A),
+  MLmatrixnorm(A, row.variance="AR(1)"),
+  MLmatrixnorm(A, row.variance="CS")
 )
 plot(res, log="y", names = c("None", "AR(1)", "CS"), 
      col = c("darkred","royalblue","lightyellow"),

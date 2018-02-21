@@ -1,0 +1,18 @@
+---
+title: why I've been using base plot
+author: gzt
+date: '2018-02-13'
+slug: why-i-ve-been-using-base-plot
+categories:
+  - R
+tags:
+  - graphics
+  - R
+  - ggplot2
+---
+
+Nobody cares what I think, of course. The grammar of graphics is The Way, and `ggplot2` is my preferred method of visualization. I never even really tried to make my own graphs with base plot until some point last fall (so: after 5 years of R) - I mean, I'm at Iowa State, after all. I don't hang out with our Graphics Group as much as I should but that's how I think about plotting. There are a few things at work here:
+
+1. Sometimes it's hard to do something in `ggplot2` and it's nice to have something else in your back pocket - that's what happened this fall.
+2. If you're working with somebody, they might not want to use `ggplot2` so you'd better be able to cope.
+3. It's good to be able to deliver code without having to worry about installing or loading a library. Sure, you can use something like `if(!require('ggplot2')) install.packages('ggplot2')` but added flexibility is never a bad thing. 
