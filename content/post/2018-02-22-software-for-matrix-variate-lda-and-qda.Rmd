@@ -1,0 +1,67 @@
+---
+title: Software for Matrix Variate LDA and QDA
+author: gzt
+date: '2018-02-22'
+slug: software-for-matrix-variate-lda-and-qda
+categories:
+  - R
+tags:
+  - matrix variate
+  - classification
+  - matrixdist
+---
+
+In the previous post, I had some rough notes on classification of matrix variate data. 
+In the `matrixdist` package, I now have some functions for training a linear or quadratic classifier.
+The usage is pretty similar to the function `MASS::lda()` or `MASS::qda()`, however it requires the input
+as an array or list of matrices and the group variable provided as a vector (that is, it cannot handle
+data frames or the formula interface directly, which is reasonable, as there is no immediately
+clear way to make that work for a collection of matrices - anybody using it would have to roll their own
+solutions anyway).
+
+```{r generatedata, cache=TRUE}
+set.seed(20180222)
+library('matrixdist')
+A <- rmatrixnorm(30, mean = matrix(0, nrow=2, ncol=3))
+B <- rmatrixnorm(30, mean = matrix(c(1,0), nrow=2, ncol=3))
+C <- rmatrixnorm(30, mean = matrix(c(0,1), nrow=2, ncol=3))
+ABC <- array(c(A,B,C), dim = c(2,3,90))
+groups <- factor(c(rep("A",30),rep("B",30),rep("C",30)))
+prior = c(30,30,30)/90
+matlda <- matrixlda(x = ABC,grouping = groups, prior = prior)
+matqda <- matrixqda(x = ABC,grouping = groups, prior = prior)
+```
+
+This does not sphere the data or extract an SVD or Fisher discriminant scores - it is a simple linear/quadratic 
+discriminant function based on the likelihood function (see previous post for details). 
+As such, the reported posteriors are based on the normal distribution.
+
+The `matrixlda` function presumes equal covariance parameters while `matrixqda` fits separate covariance parameters.
+
+It is possible to set variance or mean restrictions using the `...` argument. These restrictions are applied to all groups.
+
+The `predict` method for these objects works in much the same way as for `lda` or `qda` objects: provide the function and the new data, then it will return the MAP class assignments and the posterior. If no new data is 
+provided, it will attempt to run it on the original data if it is available in the environment.
+
+```{r predict, cache=TRUE}
+ABC[,,c(1,31,61)] # true class memberships: A, B, C
+
+predict(matlda, ABC[,,c(1,31,61)])
+
+predict(matqda,  ABC[,,c(1,31,61)])
+
+```
+In this example, points from classes A, B, and C were selected and they ended up being classifed as B, B, and A. The QDA and LDA rules had only minor disagreements, which is to be expected when they do truly have the same covariances.
+
+## Mathematical detail
+
+The factor $R$ for each group $g$ in a QDA setting is:
+
+\begin{eqnarray} 
+R_g(\mathbf{X}) & = & \mathrm{trace}\big[ -\frac{1}{2}(\mathbf{V}_g^{-1} \mathbf{X}^{T} \mathbf{U}_g^{-1} \mathbf{X}  +(\mathbf{V}_g^{-1} \mathbf{M}_g^{T} \mathbf{U}_g^{-1}) \mathbf{X}  -\frac{1}{2}(\mathbf{V}_g^{-1} \mathbf{M}_g^{T} \mathbf{U}_g^{-1} \mathbf{M}_g)  \big]   \\ 
+ &  & -\frac{1}{2}(p (\log|\mathbf{U}_g|)+ n(\log|\mathbf{V}_g|) )  + \log p_g 
+\end{eqnarray}
+When $U_i = U_j$ for all groups $i,j$, several of these terms cancel. The posterior probability is:
+
+\[ P(\mathbf{X} \in g) = \frac{ \exp (R_g (\mathbf{X}))}{\sum_i \exp (R_i(\mathbf{X}))} \]
+with the bottom sum being over all groups $i$. 
