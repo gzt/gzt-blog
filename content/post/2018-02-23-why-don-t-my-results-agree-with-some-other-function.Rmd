@@ -1,0 +1,85 @@
+---
+title: Why don't my results agree with some other function?
+author: gzt
+date: '2018-02-23'
+slug: why-don-t-my-results-agree-with-some-other-function
+categories:
+  - R
+tags:
+  - matrixdist
+  - randomness
+---
+
+Or even with other functions in the same package? With a set seed, one would expect the random draws from 
+two equivalent distributions to be the same.
+
+
+```{r thesetup}
+library('matrixdist')
+set.seed(20180223)
+rmatrixnorm(n = 1, mean = matrix(0, nrow = 1, ncol = 5), array = T)
+set.seed(20180223)
+rmatrixnorm(n = 1, mean = matrix(0, nrow = 5, ncol = 1), array = T)
+set.seed(20180223)
+rnorm(5)
+
+```
+However, this breaks when we try it with the $t$-distribution.
+
+```{r theproblem}
+set.seed(20180223)
+rmatrixt(n = 1, df = 5, mean = matrix(0, nrow = 1, ncol = 5))
+set.seed(20180223)
+rmatrixt(n = 1, df = 5, mean = matrix(0, nrow = 5, ncol = 1))
+
+```
+
+What is going on here?
+
+It is not because the densities are calculated differently or the distributions are different.
+
+```{r density, cache=TRUE}
+x = matrix(1, nrow=5, ncol=1)
+dmatrixt(x, df = 5)
+dmatrixt(t(x), df = 5)
+A <- t(drop(rmatrixt(n = 1e5, df = 5, mean = matrix(0, nrow = 1, ncol = 5))))
+B <- t(drop(rmatrixt(n = 1e5, df = 5, mean = matrix(0, nrow = 5, ncol = 1))))
+var(A)
+var(B)
+```
+
+In fact, if we look at `rmvt` from the excellent `mvtnorm` package, we can see that one of them agrees with their function.
+
+```{r rmvt}
+library('mvtnorm')
+set.seed(20180223)
+rmatrixt(n = 1, df = 5, mean = matrix(0, nrow = 1, ncol = 5))
+set.seed(20180223)
+rmvt(1,sigma=.2*diag(5), df = 5) # note that matrix t is scaled by DF compared to multivariate t
+
+```
+
+## What is going on
+
+Here is a hint as to what is happening from the source code of `rmvt`:
+
+```{r demonstrate, eval=FALSE}
+rmvnorm(n, mean = delta, sigma = sigma, ...)/sqrt(rchisq(n, 
+            df)/df)
+```
+It draws from the multivariate normal distribution and then scales by individual draws from `rchisq`. 
+This is essentially what happens in `rmatrixt` as well when the dimension of $U$ (the number of rows) is $1$. The matrix version takes the Cholesky factor of an inverse Wishart draw, which in the 1-dimensional case is the inverse of the square root of a draw from `rchisq`.
+
+However, when the dimension ($p$) of $U$ is larger than $1$, the multiplicative factor is not the same, it is  the Cholesky factor of an inverse Wishart draw of dimension $p$, which involves drawing $p$ `rchisq` and `choose(p, 2)-p` draws from `rnorm`. The densities end up the same but the computation involves such different numbers there is no hope of getting the same numbers. Further, this suggests that, when drawing from matrix variate $t$-distributions, given that $X$ and $X'$ have the same distributions, care should be taken so that the faster direction for simulation is used.
+
+```{r benchmark, cache=TRUE}
+library('microbenchmark')
+res <- microbenchmark(
+A <- rmatrixt(500, df = 5, mean = matrix(0, nrow = 2, ncol = 20)),
+A <- rmatrixt(500, df = 5, mean = matrix(0, nrow = 20, ncol = 2))
+)
+print(res)
+library('ggplot2')
+autoplot(res) + theme_bw()
+
+```
