@@ -1,0 +1,37 @@
+---
+title: CholWishart now on CRAN
+author: gzt
+date: '2018-02-26'
+slug: cholwishart-now-on-cran
+categories:
+  - R
+tags:
+  - linear algebra
+---
+
+
+
+<p>I decided to break off from <code>matrixdist</code> the portion dedicated to the Wishart-related functions. They are self-contained and don’t really exist on their own elsewhere (there are a few that include them along with a lot of other functionality, some in C++ but a lot in R), so it’s good to have a little package that offers them on their own. Not everybody would want or need <code>matrixdist</code> and it’s good to offer the option without polluting the <code>NAMESPACE</code>.</p>
+<p>The package offers:</p>
+<ul>
+<li>Sampling from the Cholesky factorization of a Wishart distribution.</li>
+<li>Sampling from an inverse Wishart distribution.</li>
+<li>Sampling from the Cholesky factorization of an inverse Wishart distribution.</li>
+<li>Density function for the Wishart and inverse Wishart distributions.</li>
+<li>Multivariate gamma and digamma functions.</li>
+</ul>
+<p>The sampling functions are in C and are based on the function <code>stats::rWishart()</code> so they are roughly as fast.</p>
+<pre class="r"><code>set.seed(20180226)
+sigma &lt;- rWishart(1, 10, diag(6))[,,1]
+args &lt;- list(n = 10000, df = 10, Sigma = sigma)
+library(&#39;CholWishart&#39;)
+library(&#39;microbenchmark&#39;)
+library(&#39;ggplot2&#39;)
+results &lt;- microbenchmark(
+  A &lt;- do.call(&quot;rWishart&quot;, args),
+  A &lt;- do.call(&quot;rCholWishart&quot;,args),
+  A &lt;- do.call(&quot;rInvWishart&quot;,args),
+  A &lt;- do.call(&quot;rInvCholWishart&quot;,args)
+)
+autoplot(results)+theme_bw()</code></pre>
+<p><img src="/post/2018-02-26-cholwishart-now-on-cran_files/figure-html/demonstration-1.png" width="672" /></p>
