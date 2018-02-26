@@ -26,7 +26,7 @@ The package offers:
 The sampling functions are in C and are based on the function `stats::rWishart()` so they are
 roughly as fast.
 
-```{r demonstration}
+```{r demonstration, cache = TRUE}
 set.seed(20180226)
 sigma <- rWishart(1, 10, diag(6))[,,1]
 args <- list(n = 10000, df = 10, Sigma = sigma)
@@ -44,7 +44,7 @@ autoplot(results)+theme_bw()
 
 ```
 
-Check out the package on [CRAN]() or install:
+Check out the package on [CRAN](https://cran.r-project.org/package=CholWishart) or install:
 
     install.packages('CholWishart')
     
