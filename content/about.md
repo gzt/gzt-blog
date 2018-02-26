@@ -29,7 +29,8 @@ I also like long walks on the beach.
  
 ### Projects
  
- * `matrixdist` an R package for working with matrix variate distributions such as the matrix variate normal or matrix variate *t*-distribution.
+ * `matrixdist` an R package for working with matrix variate distributions such as the matrix variate normal or matrix variate *t*-distribution. On [github](https://www.github.com/gzt/matrixdist).
+ * `CholWishart` an R package for some distributions and functions related to the Wishart, in particular sampling from the Cholesky factorization of the Wishart and inverse Wishart. On [CRAN](https://cran.r-project.org/package=CholWishart) and [github](https://www.github.com/gzt/CholWishart).
  * Porting scalable *k*-means++ (or *k*-means||) to OpenMPI (a minor work).
  * In progress: a similarity metric for binomial and multinomial image comparison accounting for structural similarity.
  * In progress: a parallelization of Hartigan and Wong's k-means algorithm for OpenMPI.
