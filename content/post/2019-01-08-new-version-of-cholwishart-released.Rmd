@@ -12,7 +12,6 @@ tags:
   - linear algebra
   - Wishart
   - multivariate
-authors: []
 ---
 I have just released version [0.9.4 of CholWishart](https://cran.r-project.org/package=CholWishart). If you want to simulate from the inverse Wishart, compute densities for the Wishart or inverse Wishart, or use the multivariate gamma or digamma function, this is the R package for you. It has a few other functions (notably, its namesake which generates random samples from the Wishart distribution and returns their Cholesky decomposition). 
 
