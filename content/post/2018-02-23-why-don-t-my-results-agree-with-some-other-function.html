@@ -12,7 +12,8 @@ tags:
 
 
 
-<p>Or even with other functions in the same package? With a set seed, one would expect the random draws from two equivalent distributions to be the same.</p>
+<p>Or even with other functions in the same package? With a set seed, one would expect the random draws from
+two equivalent distributions to be the same.</p>
 <pre class="r"><code>library(&#39;matrixdist&#39;)
 set.seed(20180223)
 rmatrixnorm(n = 1, mean = matrix(0, nrow = 1, ncol = 5), array = T)</code></pre>
@@ -84,7 +85,8 @@ rmvt(1,sigma=.2*diag(5), df = 5) # note that matrix t is scaled by DF compared t
 <p>Here is a hint as to what is happening from the source code of <code>rmvt</code>:</p>
 <pre class="r"><code>rmvnorm(n, mean = delta, sigma = sigma, ...)/sqrt(rchisq(n, 
             df)/df)</code></pre>
-<p>It draws from the multivariate normal distribution and then scales by individual draws from <code>rchisq</code>. This is essentially what happens in <code>rmatrixt</code> as well when the dimension of <span class="math inline">\(U\)</span> (the number of rows) is <span class="math inline">\(1\)</span>. The matrix version takes the Cholesky factor of an inverse Wishart draw, which in the 1-dimensional case is the inverse of the square root of a draw from <code>rchisq</code>.</p>
+<p>It draws from the multivariate normal distribution and then scales by individual draws from <code>rchisq</code>.
+This is essentially what happens in <code>rmatrixt</code> as well when the dimension of <span class="math inline">\(U\)</span> (the number of rows) is <span class="math inline">\(1\)</span>. The matrix version takes the Cholesky factor of an inverse Wishart draw, which in the 1-dimensional case is the inverse of the square root of a draw from <code>rchisq</code>.</p>
 <p>However, when the dimension (<span class="math inline">\(p\)</span>) of <span class="math inline">\(U\)</span> is larger than <span class="math inline">\(1\)</span>, the multiplicative factor is not the same, it is the Cholesky factor of an inverse Wishart draw of dimension <span class="math inline">\(p\)</span>, which involves drawing <span class="math inline">\(p\)</span> <code>rchisq</code> and <code>choose(p, 2)-p</code> draws from <code>rnorm</code>. The densities end up the same but the computation involves such different numbers there is no hope of getting the same numbers. Further, this suggests that, when drawing from matrix variate <span class="math inline">\(t\)</span>-distributions, given that <span class="math inline">\(X\)</span> and <span class="math inline">\(X&#39;\)</span> have the same distributions, care should be taken so that the faster direction for simulation is used.</p>
 <pre class="r"><code>library(&#39;microbenchmark&#39;)
 res &lt;- microbenchmark(
@@ -96,9 +98,9 @@ print(res)</code></pre>
 ##                                                               expr
 ##  A &lt;- rmatrixt(500, df = 5, mean = matrix(0, nrow = 2, ncol = 20))
 ##  A &lt;- rmatrixt(500, df = 5, mean = matrix(0, nrow = 20, ncol = 2))
-##        min        lq     mean    median        uq       max neval
-##   7.174038  7.431638  7.58853  7.525235  7.637626  9.790708   100
-##  26.746143 27.124713 27.83597 27.253855 27.522247 32.588822   100</code></pre>
+##        min        lq     mean   median        uq      max neval
+##   8.142352  8.283564  8.54300  8.37986  8.478347 12.59635   100
+##  26.059652 26.761277 28.03682 26.89072 28.455555 39.65610   100</code></pre>
 <pre class="r"><code>library(&#39;ggplot2&#39;)
 autoplot(res) + theme_bw()</code></pre>
 <p><img src="/post/2018-02-23-why-don-t-my-results-agree-with-some-other-function_files/figure-html/benchmark-1.png" width="672" /></p>

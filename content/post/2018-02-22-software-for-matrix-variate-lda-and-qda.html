@@ -13,7 +13,13 @@ tags:
 
 
 
-<p>In the previous post, I had some rough notes on classification of matrix variate data. In the <code>matrixdist</code> package, I now have some functions for training a linear or quadratic classifier. The usage is pretty similar to the function <code>MASS::lda()</code> or <code>MASS::qda()</code>, however it requires the input as an array or list of matrices and the group variable provided as a vector (that is, it cannot handle data frames or the formula interface directly, which is reasonable, as there is no immediately clear way to make that work for a collection of matrices - anybody using it would have to roll their own solutions anyway).</p>
+<p>In the previous post, I had some rough notes on classification of matrix variate data.
+In the <code>matrixdist</code> package, I now have some functions for training a linear or quadratic classifier.
+The usage is pretty similar to the function <code>MASS::lda()</code> or <code>MASS::qda()</code>, however it requires the input
+as an array or list of matrices and the group variable provided as a vector (that is, it cannot handle
+data frames or the formula interface directly, which is reasonable, as there is no immediately
+clear way to make that work for a collection of matrices - anybody using it would have to roll their own
+solutions anyway).</p>
 <pre class="r"><code>set.seed(20180222)
 library(&#39;matrixdist&#39;)
 A &lt;- rmatrixnorm(30, mean = matrix(0, nrow=2, ncol=3))
@@ -24,10 +30,13 @@ groups &lt;- factor(c(rep(&quot;A&quot;,30),rep(&quot;B&quot;,30),rep(&quot;C&qu
 prior = c(30,30,30)/90
 matlda &lt;- matrixlda(x = ABC,grouping = groups, prior = prior)
 matqda &lt;- matrixqda(x = ABC,grouping = groups, prior = prior)</code></pre>
-<p>This does not sphere the data or extract an SVD or Fisher discriminant scores - it is a simple linear/quadratic discriminant function based on the likelihood function (see previous post for details). As such, the reported posteriors are based on the normal distribution.</p>
+<p>This does not sphere the data or extract an SVD or Fisher discriminant scores - it is a simple linear/quadratic
+discriminant function based on the likelihood function (see previous post for details).
+As such, the reported posteriors are based on the normal distribution.</p>
 <p>The <code>matrixlda</code> function presumes equal covariance parameters while <code>matrixqda</code> fits separate covariance parameters.</p>
 <p>It is possible to set variance or mean restrictions using the <code>...</code> argument. These restrictions are applied to all groups.</p>
-<p>The <code>predict</code> method for these objects works in much the same way as for <code>lda</code> or <code>qda</code> objects: provide the function and the new data, then it will return the MAP class assignments and the posterior. If no new data is provided, it will attempt to run it on the original data if it is available in the environment.</p>
+<p>The <code>predict</code> method for these objects works in much the same way as for <code>lda</code> or <code>qda</code> objects: provide the function and the new data, then it will return the MAP class assignments and the posterior. If no new data is
+provided, it will attempt to run it on the original data if it is available in the environment.</p>
 <pre class="r"><code>ABC[,,c(1,31,61)] # true class memberships: A, B, C</code></pre>
 <pre><code>## , , 1
 ## 
@@ -62,10 +71,10 @@ matqda &lt;- matrixqda(x = ABC,grouping = groups, prior = prior)</code></pre>
 ## Levels: A B C
 ## 
 ## $posterior
-##            [,1]        [,2]        [,3]
-## [1,] 0.21908081 0.759188619 0.021730570
-## [2,] 0.02891752 0.967683854 0.003398627
-## [3,] 0.51365460 0.008473296 0.477872107</code></pre>
+##           [,1]        [,2]       [,3]
+## [1,] 0.2502014 0.726688139 0.02311051
+## [2,] 0.0342978 0.961948479 0.00375372
+## [3,] 0.5318650 0.007353527 0.46078146</code></pre>
 <p>In this example, points from classes A, B, and C were selected and they ended up being classifed as B, B, and A. The QDA and LDA rules had only minor disagreements, which is to be expected when they do truly have the same covariances.</p>
 <div id="mathematical-detail" class="section level2">
 <h2>Mathematical detail</h2>
@@ -75,5 +84,6 @@ R_g(\mathbf{X}) &amp; = &amp; \mathrm{trace}\big[ -\frac{1}{2}(\mathbf{V}_g^{-1}
  &amp;  &amp; -\frac{1}{2}(p (\log|\mathbf{U}_g|)+ n(\log|\mathbf{V}_g|) )  + \log p_g 
 \end{eqnarray}\]</span>
 <p>When <span class="math inline">\(U_i = U_j\)</span> for all groups <span class="math inline">\(i,j\)</span>, several of these terms cancel. The posterior probability is:</p>
-<p><span class="math display">\[ P(\mathbf{X} \in g) = \frac{ \exp (R_g (\mathbf{X}))}{\sum_i \exp (R_i(\mathbf{X}))} \]</span> with the bottom sum being over all groups <span class="math inline">\(i\)</span>.</p>
+<p><span class="math display">\[ P(\mathbf{X} \in g) = \frac{ \exp (R_g (\mathbf{X}))}{\sum_i \exp (R_i(\mathbf{X}))} \]</span>
+with the bottom sum being over all groups <span class="math inline">\(i\)</span>.</p>
 </div>

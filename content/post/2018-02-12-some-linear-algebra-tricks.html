@@ -99,7 +99,13 @@ print(cholinv)</code></pre>
 </div>
 <div id="determinants" class="section level2">
 <h2>Determinants</h2>
-<p>One good reason to have a Cholesky decomposition or eigenvalue decomposition on hand (besides the fun of it) is to avoid computing a determinant, which comes up in densities all the time. Again, since we’re looking at a covariance matrix, there are ways around direct computation. Both of these are unfortunately of the same order of complexity as computing a determinant but slightly faster. However, if you need a determinant, you just might also need the eigenvalues or the Cholesky decomposition or an inverse. If that is the case, what were once modest gains in speed become big savings.</p>
+<p>One good reason to have a Cholesky decomposition or eigenvalue decomposition on hand
+(besides the fun of it) is to avoid computing a determinant, which comes up in densities
+all the time. Again, since we’re looking at a covariance matrix, there are ways around
+direct computation. Both of these are unfortunately of the same order of complexity as
+computing a determinant but slightly faster. However, if you need a determinant,
+you just might also need the eigenvalues or the Cholesky decomposition or an inverse.
+If that is the case, what were once modest gains in speed become big savings.</p>
 <pre class="r"><code>detbenchmark &lt;- microbenchmark(
   det(A),
   prod(diag((chol(A))))^2,
