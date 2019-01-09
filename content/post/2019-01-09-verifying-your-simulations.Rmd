@@ -1,0 +1,71 @@
+---
+title: Quick Checks of Your Simulated Distributions
+author: gzt
+date: '2019-01-09'
+categories:
+  - R
+tags:
+  - matrix variate
+  - multivariate
+  - profiling
+  - R
+  - Wishart
+slug: verifying-your-simulations
+---
+I've written a couple packages for simulating from some distributions (Wishart-related distributions in `CholWishart` and matrix-variate distributions in `matrixdist`) and sometimes when a new function has been written or has been refactored, you need some ways to verify it is giving the answers you expect. There is an entire literature on this in general, but I am going to discuss one handy trick I sometimes use if there isn't much theory to rely on or if you just want some quick heuristic to show you are in the right ballpark. 
+
+Sometimes there are known theoretical distributions of test statistics based on your distribution, in which case those can be used (if they don't rely too heavily on asymptotics and can actually distinguish from something wrong).
+
+The way I implemented `rCholWishart` and `rInvWishart`, they should give, with the same seeds, equivalent answers to `rWishart` if an identity covariance matrix is used, so this becomes fairly easy: give them the same seeds and see if they are what is expected.
+
+```{r wishart, cache = TRUE}
+library('CholWishart')
+set.seed(20190109)
+A <- rWishart(1, 5, diag(3))[,,1]
+set.seed(20190109)
+B <- rInvWishart(1, 5, diag(3))[,,1]
+A %*% B
+```
+
+Incidentally, the package `bench` is useful if you want to benchmark two versions of the same function which should output the exact same thing. 
+
+However, some of my functions are re-implementations of functions in other packages that do not use the results of the random number generator in the same way, so, while I trust (or should I?) their results, mine are not exactly the same. Or perhaps I am trying an efficient re-implementation of a slow function and need to verify the results are as they seem. 
+
+Consider this in the case of the pseudo Wishart. Let $X_i \sim MVN_p(\mathbf{0}, \Sigma)$ for $i = 1, 2, \ldots, n$ be $n$ i.i.d. draws from a $p$-dimensional multivariate normal distribution with mean $\mathbf{0}$ and covariance matrix $\Sigma$. Then if $n > p -1$, the $\sum X_i X_i^T$ is distributed as a Wishart random matrix with $n$ degrees of freedom. If $n \leq p-1$, this is a singular distribution known as the pseudo Wishart distribution.
+There is a function in another package, `rWishart`, which handles it. I wrote a slow version myself for my own package (v0.9.4) and a fast version for the latest (still in development) version (v1.0.0). We may want to verify that things are what they seem. It is straightforward to simulate from this distribution: simulate from a multivariate normal (try `MASS::mvrnorm`), multiply them together appropriately, and there is your random matrix. This can serve as a "ground truth" if we trust `MASS` and our multiplicative abilities. Then we can compare to another package (presumed to be correct) and then to the function that is going to be in this package. We should not be surprised if the naive "ground truth" is faster than the version in some package, since this version does not include input validation or error checking, which a function for general use should. 
+
+What I like to do as a first sanity check is to simulate a modest number (say, 1000) and make sure the figures are roughly comparable. Note, by the way, I start by simulating a covariance matrix to use as input to the functions - I don't want to use an identity matrix because we want to know that the things are factoring the covariance matrices appropriately. So here we are going to simulate 1000 draws from a pseudo-Wishart with 3 degrees of freedom and dimension 5 with a covariance matrix $A$. If we wanted to, we could profile these results and compare timings as well.
+
+```{r check, dependson="wishart"}
+A <- rWishart(1, 10, diag(5))[,,1]
+A
+# There are better ways of doing B, but I want a quick-and-dirty
+# that is verifiably correct
+B <- MASS::mvrnorm(3000, rep(0,5), A)
+Blist <- list()
+for (i in 1:1000) Blist[[i]] <- crossprod(B[(3*i-2):(3*i),])
+
+C <- rWishart::rPsuedoWishart(1000, 3, A)
+
+D <- CholWishart::rPseudoWishart(1000, 3, A)
+
+```
+
+The first thing I would do is compare the sum of the elements - these should be roughly the same. Here there is a theoretical result - the sum should be distributed as a Wishart with 3000 degrees of freedom.
+
+```{r sumresult, dependson="wishart"}
+Reduce(`+`, Blist)
+rowSums(x = C, na.rm = FALSE, dims = 2L)
+rowSums(D, FALSE, 2L)
+```
+
+The expected value of these is $3000 A$ and you can find the variance of individual terms if you really want, but this is perhaps better as a rough sanity check during development. Here it can be seen that the three methods have roughly the same average result. Not shown here, but you may also which to compare, say, box plots of the distributions of the 25 elements and repeat this with some other covariance matrices as input (say, an $AR(1)$ matrix). This exercise may seem a little trivial, but, for instance, the inverse Wishart has a few different definitions of the degrees of freedom parameter. If you wish to substitute one function for another (that is faster), it is important to verify that they are parameterized in the same way or that the reparameterization is the same.
+
+```{r inversewishart, dependson="wishart"}
+Laplacelist <- list()
+for (i in 1:1000) Laplacelist[[i]] <- LaplacesDemon::rinvwishart(10, A)
+MyInvWishart <- CholWishart::rInvWishart(1000, 10, A)
+Reduce(`+`, Laplacelist)
+rowSums(MyInvWishart, FALSE, 2L)
+```
+This suggests, then, that the results functions have the same parameterization for the degrees of freedom.

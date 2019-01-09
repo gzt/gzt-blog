@@ -1,0 +1,92 @@
+---
+title: Quick Checks of Your Simulated Distributions
+author: gzt
+date: '2019-01-09'
+categories:
+  - R
+tags:
+  - matrix variate
+  - multivariate
+  - profiling
+  - R
+  - Wishart
+slug: verifying-your-simulations
+---
+
+
+
+<p>I’ve written a couple packages for simulating from some distributions (Wishart-related distributions in <code>CholWishart</code> and matrix-variate distributions in <code>matrixdist</code>) and sometimes when a new function has been written or has been refactored, you need some ways to verify it is giving the answers you expect. There is an entire literature on this in general, but I am going to discuss one handy trick I sometimes use if there isn’t much theory to rely on or if you just want some quick heuristic to show you are in the right ballpark.</p>
+<p>Sometimes there are known theoretical distributions of test statistics based on your distribution, in which case those can be used (if they don’t rely too heavily on asymptotics and can actually distinguish from something wrong).</p>
+<p>The way I implemented <code>rCholWishart</code> and <code>rInvWishart</code>, they should give, with the same seeds, equivalent answers to <code>rWishart</code> if an identity covariance matrix is used, so this becomes fairly easy: give them the same seeds and see if they are what is expected.</p>
+<pre class="r"><code>library(&#39;CholWishart&#39;)
+set.seed(20190109)
+A &lt;- rWishart(1, 5, diag(3))[,,1]
+set.seed(20190109)
+B &lt;- rInvWishart(1, 5, diag(3))[,,1]
+A %*% B</code></pre>
+<pre><code>##              [,1]          [,2]         [,3]
+## [1,] 1.000000e+00  0.000000e+00 4.440892e-16
+## [2,] 0.000000e+00  1.000000e+00 1.110223e-16
+## [3,] 4.440892e-16 -5.551115e-17 1.000000e+00</code></pre>
+<p>Incidentally, the package <code>bench</code> is useful if you want to benchmark two versions of the same function which should output the exact same thing.</p>
+<p>However, some of my functions are re-implementations of functions in other packages that do not use the results of the random number generator in the same way, so, while I trust (or should I?) their results, mine are not exactly the same. Or perhaps I am trying an efficient re-implementation of a slow function and need to verify the results are as they seem.</p>
+<p>Consider this in the case of the pseudo Wishart. Let <span class="math inline">\(X_i \sim MVN_p(\mathbf{0}, \Sigma)\)</span> for <span class="math inline">\(i = 1, 2, \ldots, n\)</span> be <span class="math inline">\(n\)</span> i.i.d. draws from a <span class="math inline">\(p\)</span>-dimensional multivariate normal distribution with mean <span class="math inline">\(\mathbf{0}\)</span> and covariance matrix <span class="math inline">\(\Sigma\)</span>. Then if <span class="math inline">\(n &gt; p -1\)</span>, the <span class="math inline">\(\sum X_i X_i^T\)</span> is distributed as a Wishart random matrix with <span class="math inline">\(n\)</span> degrees of freedom. If <span class="math inline">\(n \leq p-1\)</span>, this is a singular distribution known as the pseudo Wishart distribution. There is a function in another package, <code>rWishart</code>, which handles it. I wrote a slow version myself for my own package (v0.9.4) and a fast version for the latest (still in development) version (v1.0.0). We may want to verify that things are what they seem. It is straightforward to simulate from this distribution: simulate from a multivariate normal (try <code>MASS::mvrnorm</code>), multiply them together appropriately, and there is your random matrix. This can serve as a “ground truth” if we trust <code>MASS</code> and our multiplicative abilities. Then we can compare to another package (presumed to be correct) and then to the function that is going to be in this package. We should not be surprised if the naive “ground truth” is faster than the version in some package, since this version does not include input validation or error checking, which a function for general use should.</p>
+<p>What I like to do as a first sanity check is to simulate a modest number (say, 1000) and make sure the figures are roughly comparable. Note, by the way, I start by simulating a covariance matrix to use as input to the functions - I don’t want to use an identity matrix because we want to know that the things are factoring the covariance matrices appropriately. So here we are going to simulate 1000 draws from a pseudo-Wishart with 3 degrees of freedom and dimension 5 with a covariance matrix <span class="math inline">\(A\)</span>. If we wanted to, we could profile these results and compare timings as well.</p>
+<pre class="r"><code>A &lt;- rWishart(1, 10, diag(5))[,,1]
+A</code></pre>
+<pre><code>##            [,1]      [,2]       [,3]      [,4]      [,5]
+## [1,]  9.2262807 -6.200813 -0.8685732  3.006720 -7.395744
+## [2,] -6.2008125  8.927408  0.6052070  2.317195  7.305159
+## [3,] -0.8685732  0.605207  8.0806719 -3.054297 -0.457451
+## [4,]  3.0067197  2.317195 -3.0542970 11.574879 -1.452411
+## [5,] -7.3957440  7.305159 -0.4574510 -1.452411  9.749766</code></pre>
+<pre class="r"><code># There are better ways of doing B, but I want a quick-and-dirty
+# that is verifiably correct
+B &lt;- MASS::mvrnorm(3000, rep(0,5), A)
+Blist &lt;- list()
+for (i in 1:1000) Blist[[i]] &lt;- crossprod(B[(3*i-2):(3*i),])
+
+C &lt;- rWishart::rPsuedoWishart(1000, 3, A)
+
+D &lt;- CholWishart::rPseudoWishart(1000, 3, A)</code></pre>
+<p>The first thing I would do is compare the sum of the elements - these should be roughly the same. Here there is a theoretical result - the sum should be distributed as a Wishart with 3000 degrees of freedom.</p>
+<pre class="r"><code>Reduce(`+`, Blist)</code></pre>
+<pre><code>##            [,1]       [,2]      [,3]      [,4]       [,5]
+## [1,]  27565.321 -18651.829 -2138.801  8031.953 -21527.564
+## [2,] -18651.829  26757.781  1388.668  7527.585  21613.654
+## [3,]  -2138.801   1388.668 24792.339 -9753.315  -2073.009
+## [4,]   8031.953   7527.585 -9753.315 34720.093  -3137.397
+## [5,] -21527.564  21613.654 -2073.009 -3137.397  28267.008</code></pre>
+<pre class="r"><code>rowSums(x = C, na.rm = FALSE, dims = 2L)</code></pre>
+<pre><code>##            [,1]      [,2]       [,3]       [,4]       [,5]
+## [1,] 1490828.55 -469207.7  -52086.42  265758.24 -282072.87
+## [2,] -469207.75  455437.8 -145829.39  135607.77  107591.31
+## [3,]  -52086.42 -145829.4  285730.29 -128320.17  -15181.54
+## [4,]  265758.24  135607.8 -128320.17  216503.43  -42798.66
+## [5,] -282072.87  107591.3  -15181.54  -42798.66   62265.16</code></pre>
+<pre class="r"><code>rowSums(D, FALSE, 2L)</code></pre>
+<pre><code>##           [,1]       [,2]      [,3]      [,4]       [,5]
+## [1,]  27556.89 -18049.846 -2081.950  9223.790 -22020.422
+## [2,] -18049.85  26323.893  1137.398  7193.153  21898.722
+## [3,]  -2081.95   1137.398 23471.798 -8921.188  -1738.466
+## [4,]   9223.79   7193.153 -8921.188 35459.581  -4111.849
+## [5,] -22020.42  21898.722 -1738.466 -4111.849  29202.886</code></pre>
+<p>The expected value of these is <span class="math inline">\(3000 A\)</span> and you can find the variance of individual terms if you really want, but this is perhaps better as a rough sanity check during development. Here it can be seen that the three methods have roughly the same average result. Not shown here, but you may also which to compare, say, box plots of the distributions of the 25 elements and repeat this with some other covariance matrices as input (say, an <span class="math inline">\(AR(1)\)</span> matrix). This exercise may seem a little trivial, but, for instance, the inverse Wishart has a few different definitions of the degrees of freedom parameter. If you wish to substitute one function for another (that is faster), it is important to verify that they are parameterized in the same way or that the reparameterization is the same.</p>
+<pre class="r"><code>Laplacelist &lt;- list()
+for (i in 1:1000) Laplacelist[[i]] &lt;- LaplacesDemon::rinvwishart(10, A)
+MyInvWishart &lt;- CholWishart::rInvWishart(1000, 10, A)
+Reduce(`+`, Laplacelist)</code></pre>
+<pre><code>##            [,1]       [,2]      [,3]      [,4]       [,5]
+## [1,]  2305.8541 -1571.6677 -217.7485  648.9478 -1852.5833
+## [2,] -1571.6677  2247.8176  203.7237  646.2970  1824.6910
+## [3,]  -217.7485   203.7237 2202.1261 -796.8863  -163.5460
+## [4,]   648.9478   646.2970 -796.8863 2867.5037  -254.8008
+## [5,] -1852.5833  1824.6910 -163.5460 -254.8008  2449.3090</code></pre>
+<pre class="r"><code>rowSums(MyInvWishart, FALSE, 2L)</code></pre>
+<pre><code>##            [,1]       [,2]       [,3]      [,4]        [,5]
+## [1,]  2253.3570 -1537.0797 -291.71139  767.0758 -1820.76919
+## [2,] -1537.0797  2250.1777  181.11747  614.5197  1840.93160
+## [3,]  -291.7114   181.1175 1969.53377 -776.3872   -41.93022
+## [4,]   767.0758   614.5197 -776.38720 3017.8656  -347.40198
+## [5,] -1820.7692  1840.9316  -41.93022 -347.4020  2429.55687</code></pre>
+<p>This suggests, then, that the results functions have the same parameterization for the degrees of freedom.</p>
