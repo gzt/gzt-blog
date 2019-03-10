@@ -48,13 +48,17 @@ don't want to mess with.
 
 ## So what PRNG are we using anyway
 
-The helpful `R` documentation says the default method is the 
+The helpful `R` documentation says the default method in `R` is the 
 [Mersenne Twister](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/emt19937ar.html) 
 algorithm, which seems to be a *de facto* standard. The reference implementation is in 
 [pretty clean C code](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c) and seems fairly straightforward. Neat! There's a little warning on the site that
 old methods of initialization aren't so good, so we'll have to see what `R` is doing and
 be careful when deciding what to do ourselves. In the future I might want to replicate the
 other methods that `R` offers but that adds some overhead.
+
+The default method for the `R` standalone library called from C, though is the Marsaglia Multicarry.
+I could implement that to completely duplicate the `Rmath.h` experience or I could duplicate the
+actual `R` experience. I'm leaning toward the latter, as Marsaglia seems a little too easy!
 
 Now to check the `R` code to [see how they implement this](https://svn.r-project.org/R/trunk/src/main/RNG.c).
 They have a helpful comment about what they're doing.
@@ -130,16 +134,17 @@ by reading the next entry of the state (ie, step 2 is simply the identity).
 When you have gone through all 623 entries, it 
 generates a new state (ie 623 new random numbers). The other PRNGs in `R` have smaller states.
 However, you do not provide `R` with 623 32-bit integers, you provide it with 1 in `R` 
-itself or 2 when calling it from C. So, what are we doing?
+itself or 2 when calling it from C (note Marsaglia Multicarry has a state of size 2 and an identity function 
+for step 2 as well). So, what are we doing?
 
 In looking at the code, they aren't using the outdated initialization which the authors
 of the MT algorithm warn against. It *looks* like they initialize by using the good ol' 
 LCG (with a multiplier of `69069`, nice) with whatever (one) seed is provided to fill out 
 the state space and then generate a new state based on that. 
-It also looks like, correct me if I'm wrong, only one of the two
-seeds passed to `R` from `set_seed()` in C is used for initializing `runif()` with MT.
-This is not exposed to the user. This could be an issue for some, as, like, 
-this means there are only `2^32` possible initializations in `R`, but it's not a big problem.
+`R` from `set_seed()` in C uses both values for initializing `runif()` with Marsaglia Multicarry,
+and perhaps we should want to emulate this behavior rather than consider how MT is initialized.
+For users of MT in R, this could be an issue for some, as, like, 
+this means there are only `2^32` possible initializations, but it's not a big problem.
 However, what are the odds we'll be providing an actual 32 bits of entropy to the generator?
 It would be nice to be able to add in more entropy! The reference implementation also provides
 a method for initializing with an arbitrary array of values. This is good.
@@ -187,7 +192,8 @@ global variables for state. You can get around this.
 ## Future thoughts
 
 The MT random number generator has a few difficulties: it fails statistical tests, has a 
-large state, has problems when it comes to seeds that differ very little (problem for parallelism), and is slow for what it gives you. Also, observing a few hundred draws will
+large state, has problems when it comes to seeds that differ very little (problem for parallelism), 
+and is slow for what it gives you. Also, observing a few hundred draws will
 tell you everything you need to know about the state, which you may or may not care about.
 
 There are other PRNGs that may or may not have these problems. In the future, I'll talk about
