@@ -199,3 +199,17 @@ tell you everything you need to know about the state, which you may or may not c
 There are other PRNGs that may or may not have these problems. In the future, I'll talk about
 implementing them in `R` or what difficulties there are in doing that (I've been looking at
 [PCG](https://www.pcg-random.org), for one). 
+
+## Footnote: Marsaglia Multicarry
+
+It's pretty easy code, it fits on three lines:
+
+```
+  /* 0177777(octal) == 65535(decimal)*/
+      I1= 36969*(I1 & 0177777) + (I1>>16);
+      I2= 18000*(I2 & 0177777) + (I2>>16);
+      return fixup(((I1 << 16)^(I2 & 0177777)) * i2_32m1); /* in [0,1) */
+```
+
+`I1` is one seed, `I2` is another seed, `i2_32m1` is $2^{32}-1$. Figuring out what's going on there is an 
+exercise, I guess.
