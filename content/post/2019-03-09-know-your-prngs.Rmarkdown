@@ -130,7 +130,7 @@ Many generators put all their work in one or the other of these steps. If you kn
 you know the entire future of the PRNG. If there is an easy function for inverting step 2,
 you can find out the state of the PRNG by observing enough random numbers.
 The Mersenne Twister has a state that is 623-dimensional and you obtain the next random number 
-by reading the next entry of the state (ie, step 2 is simply the identity). 
+by reading the next entry of the state and doing a simple, invertible function of it. 
 When you have gone through all 623 entries, it 
 generates a new state (ie 623 new random numbers). The other PRNGs in `R` have smaller states.
 However, you do not provide `R` with 623 32-bit integers, you provide it with 1 in `R` 
