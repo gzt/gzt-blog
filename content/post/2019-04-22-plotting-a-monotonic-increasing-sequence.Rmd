@@ -97,7 +97,7 @@ nreps = 30
 df <- tibble( x = rep(1:10, each = nreps) + rnorm(10*nreps, sd = 0.2), 
               means = rep(sample(1:10, 10, replace = TRUE), each = nreps),
               y = rnorm(10*nreps, means, 3))
-qplot(x,y,data=df) + theme_bw()
+plotly::ggplotly(qplot(x,y,data=df) + theme_bw())
 ```
 
 I want to have the local maxima marked by a curve in a LOESS-like fashion, probably with a specified bandwidth. Whether it catches the dip at approximately 7 or not depends on the bandwidth, but it certainly shouldn't think the maximum just after 5 is where the line should stay forever. I'll get around to writing this soon. 
