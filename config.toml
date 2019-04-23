@@ -14,8 +14,9 @@ preserveTaxonomyNames = true
 enableRobotsTXT = true # generate robots.txt
 
 # Syntax Highlighting ( https://gohugo.io/content-management/syntax-highlighting/ )
-pygmentsCodeFences = true
+pygmentsCodefences = true
 pygmentsCodefencesGuessSyntax = true
+pygmentsUseClasses = true
 
 # Missing translations will default to this content language
 defaultContentLanguage = "en"
@@ -26,7 +27,7 @@ title404 = "Nothing's here!"
 
 [params.assets]
 favicon = "favicon.ico"
-customCSS = ["css/custom.css"]
+customCSS = ["css/syntax.css"]
 customJS = ["js/custom.js"]
 gopher = "" # used in 404 template ( Generator: https://gopherize.me )
 
