@@ -1,0 +1,105 @@
+---
+title: Plotting a Monotonic Increasing Sequence
+author: gzt
+date: '2019-04-22'
+slug: plotting-a-monotonic-increasing-sequence
+categories:
+  - R
+tags:
+  - ggplot2
+  - graphics
+  - R
+authors: []
+---
+I recently had an issue where I wanted to plot a line connecting the monotonically increasing part of some subset of the data. So I figured I would try to make my own `ggplot2` layer to do it.
+
+It's actually pretty straightforward! The first step is to read the [documentation](https://ggplot2.tidyverse.org/articles/extending-ggplot2.html) for extending `ggplot2`. A helpful quote if you ever have impostor syndrome: 
+
+> As you read this document, you’ll see many things that will make you scratch your head and wonder why on earth is it designed this way? Mostly it’s historical accident - I wasn’t a terribly good R programmer when I started writing `ggplot2` and I made a lot of questionable decisions.
+
+It would be weird if you were trying something big and hard and new and weren't feeling a bit nervous and out of place. If we say that we have no sin, we deceive ourselves, and the truth is not in us. You can do it, though, dear reader. I believe in you, and the R community is very helpful in these great and final days. 
+
+The first problem is, given some set of data, how to find that monotonically increasing part. 
+It's a fairly straightfoward idea: sort in terms of the `x` variable, step through and note the points where the observed `y` variable is higher than any point you've seen before. 
+
+```{r define}
+monoselect <- function(x, y)
+{
+  if (missing(y) || is.null(y))
+    stop("numeric y must be supplied.")
+
+  ord <- order(x)
+  len <- length(x)
+  if (len != length(y)) stop("y must have same length as x.")
+  returnvec = ord[1]
+  tmp = y[ord[1]]
+  for (i in 2:length(x)) {
+    if (y[ord[i]] >= tmp) {
+      returnvec = c(returnvec, ord[i])
+      tmp = y[ord[i]]
+    }
+  }
+  returnvec
+}
+
+```
+
+This is precisely analogous to the `chull` example in the documentation, so we can make a similar change as there:
+
+```{r ggprotostuff}
+library(ggplot2)
+# make new stat based on monoselect
+StatMono <- ggproto("StatMono", Stat,
+                     compute_group = function(data, scales) {
+                       data[monoselect(data$x, data$y), , drop = FALSE]
+                     },
+
+                     required_aes = c("x", "y")
+)
+
+# make new layer based on StatMono
+stat_mono <- function(mapping = NULL, data = NULL, geom = "line",
+                       position = "identity", na.rm = FALSE, show.legend = NA,
+                       inherit.aes = TRUE, ...) {
+  layer(
+    stat = StatMono, data = data, mapping = mapping, geom = geom,
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+```
+
+
+What it looks like:
+
+```{r demo}
+set.seed(20190422)
+library(tibble)
+df <- tibble(group = rep(c('A','B'), times = 50),
+             x = rep(1:50, 2),
+             y = (rep(1:2, times = 50) * x + 7 * rnorm(100)))
+p <- ggplot(data = df, mapping = aes(color = group, x = x, y = y)) +
+        geom_point() + 
+        stat_mono(aes(color = group)) +
+        NULL
+plotly::ggplotly(p)
+```
+
+Incidentally, if you don't know this trick, give it a whirl: when you're adding
+to a `ggplot`, write your code as `whatever() +` and throw a `NULL` at the end. 
+It makes it easier to add or comment out lines without worrying about killing
+the plot. 
+
+Next I am interested in finding local maxima, I haven't written the functions yet, but here is what I want to accomplish:
+
+```{r whatiwant}
+nreps = 30
+df <- tibble( x = rep(1:10, each = nreps) + rnorm(10*nreps, sd = 0.2), 
+              means = rep(sample(1:10, 10, replace = TRUE), each = nreps),
+              y = rnorm(10*nreps, means, 3))
+qplot(x,y,data=df) + theme_bw()
+```
+
+I want to have the local maxima marked by a curve in a LOESS-like fashion, probably with a specified bandwidth. Whether it catches the dip at approximately 7 or not depends on the bandwidth, but it certainly shouldn't think the maximum just after 5 is where the line should stay forever. I'll get around to writing this soon. 
+
+I don't know if these two functions are worth turning into a package, but they'd be useful enough for a couple things I'm doing at the moment. Whatever the case, here you got to see my first attempt at making my own `ggplot2` extensions. If you write something for the open question at the end here before I do, let me know. 

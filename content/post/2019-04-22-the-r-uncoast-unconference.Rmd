@@ -6,7 +6,8 @@ slug: the-r-uncoast-unconference
 categories:
   - R
 tags:
-  - R, unconference
+  - R 
+  - unconference
 authors: []
 ---
 Last week, I participated in the [Uncoast Unconference](http://uuconf.rbind.io/), which was a great opportunity to catch up with some old colleagues, meet a bunch of new people, and collaborate on some interesting projects. 
