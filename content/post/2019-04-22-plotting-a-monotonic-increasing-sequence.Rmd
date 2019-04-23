@@ -107,4 +107,4 @@ I don't know if these two functions are worth turning into a package, but they'd
 
 
 
-[1]: Incidentally, I found James Comey's remarks on this in, if I recall correctly, [this pod-cast](https://www.lawfareblog.com/lawfare-podcast-james-comey-higher-loyalty), rather refreshing. It is kind of an odd reference for me to make, in some sense, but also completely characteristic in another. The context was new hires to the FBI and his point was essentially that joining the Bureau was a big thing and it would worrisome *not* to sometimes feel a little overwhelmed and out of place. I found it refreshing.
+[1]: Incidentally, I found James Comey's remarks on this in, if I recall correctly, [this pod-cast](https://www.lawfareblog.com/lawfare-podcast-james-comey-higher-loyalty), rather refreshing. It is kind of an odd reference for me to make, in some sense, but also completely characteristic in another. The context was new hires to the FBI and his point was essentially that joining the Bureau was a big thing and it would worrisome *not* to sometimes feel a little overwhelmed and out of place. 
