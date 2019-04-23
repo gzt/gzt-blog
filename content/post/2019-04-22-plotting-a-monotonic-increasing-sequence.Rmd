@@ -17,7 +17,7 @@ It's actually pretty straightforward! The first step is to read the [documentati
 
 > As you read this document, you’ll see many things that will make you scratch your head and wonder why on earth is it designed this way? Mostly it’s historical accident - I wasn’t a terribly good R programmer when I started writing `ggplot2` and I made a lot of questionable decisions.
 
-It would be weird if you were trying something big and hard and new and weren't feeling a bit nervous and out of place. If we say that we have no sin, we deceive ourselves, and the truth is not in us. You can do it, though, dear reader. I believe in you, and the R community is very helpful in these great and final days. 
+It would be weird if you were trying something big and hard and new and weren't feeling a bit nervous and out of place[1]. If we say that we have no sin, we deceive ourselves, and the truth is not in us. You can do it, though, dear reader. I believe in you, and the R community is very helpful in these great and final days. 
 
 The first problem is, given some set of data, how to find that monotonically increasing part. 
 It's a fairly straightfoward idea: sort in terms of the `x` variable, step through and note the points where the observed `y` variable is higher than any point you've seen before. 
@@ -97,9 +97,13 @@ nreps = 30
 df <- tibble( x = rep(1:10, each = nreps) + rnorm(10*nreps, sd = 0.2), 
               means = rep(sample(1:10, 10, replace = TRUE), each = nreps),
               y = rnorm(10*nreps, means, 3))
-plotly::ggplotly(qplot(x,y,data=df) + theme_bw())
+plotly::ggplotly(qplot(x,y,data = df) + theme_bw())
 ```
 
 I want to have the local maxima marked by a curve in a LOESS-like fashion, probably with a specified bandwidth. Whether it catches the dip at approximately 7 or not depends on the bandwidth, but it certainly shouldn't think the maximum just after 5 is where the line should stay forever. I'll get around to writing this soon. 
 
 I don't know if these two functions are worth turning into a package, but they'd be useful enough for a couple things I'm doing at the moment. Whatever the case, here you got to see my first attempt at making my own `ggplot2` extensions. If you write something for the open question at the end here before I do, let me know. 
+
+
+
+[1]: Incidentally, I found James Comey's remarks on this in, if I recall correctly, [this pod-cast](https://www.lawfareblog.com/lawfare-podcast-james-comey-higher-loyalty), rather refreshing. It is kind of an odd reference for me to make, in some sense, but also completely characteristic in another. The context was new hires to the FBI and his point was essentially that joining the Bureau was a big thing and it would worrisome *not* to sometimes feel a little overwhelmed and out of place. I found it refreshing.
