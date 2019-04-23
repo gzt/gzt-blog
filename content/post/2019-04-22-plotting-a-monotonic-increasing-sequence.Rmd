@@ -81,6 +81,7 @@ df <- tibble(group = rep(c('A','B'), times = 50),
 p <- ggplot(data = df, mapping = aes(color = group, x = x, y = y)) +
         geom_point() + 
         stat_mono(aes(color = group)) +
+        theme_minimal() +
         NULL
 plotly::ggplotly(p)
 ```
