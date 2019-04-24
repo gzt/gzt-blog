@@ -33,9 +33,10 @@ I also like long walks on the beach.
  * `matrixdist` an R package for working with matrix variate distributions such as the matrix variate normal or matrix variate *t*-distribution. On [github](https://www.github.com/gzt/matrixdist).
  * `CholWishart` an R package for some distributions and functions related to the Wishart, in particular sampling from the Cholesky factorization of the Wishart and inverse Wishart. On [CRAN](https://cran.r-project.org/package=CholWishart) and [github](https://www.github.com/gzt/CholWishart).
  * Porting [scalable *k*-means++](https://arxiv.org/abs/1203.6402) (or *k*-means||) to OpenMPI (a minor work).
+ * A [small C program](https://www.github.com/gzt/replaceR) to replace the use of the Rmath standalone library for random  number generation. 
  * In progress: a similarity metric for binomial and multinomial image comparison accounting for structural similarity.
  * In progress: a parallelization of Hartigan and Wong's k-means algorithm for OpenMPI.
- * In progress: a clustering-based image compression algorithm.
+ * In progress: a clustering-based image compression algorithm - see the 2014 award.
  * In progress: multinomial clustering with covariates.
  * In progress: forensic matching of knife fragments.
  * In progress: even more.
@@ -43,6 +44,7 @@ I also like long walks on the beach.
 ### Other activities
 
  * STATCOM - Statistics in the Community. Currently the president of the Iowa State University chapter. Provides outreach to the greater community - statistical consulting to non-profits as well as educational and informative events.
+ * President of the Parish Council - 2015-16, Holy Transfiguration Orthodox Christian Church, Ames, IA. 
 
 ### Prior work
  
