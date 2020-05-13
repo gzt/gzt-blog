@@ -1,6 +1,6 @@
 baseurl = "/"
 languageCode = "en-us"
-title = "gzt does statistics"
+title = "A Hugo website"
 theme = "hugo-lithium"
 googleAnalytics = ""
 disqusShortname = ""
@@ -14,16 +14,13 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     url = "/about/"
 [[menu.main]]
     name = "GitHub"
-    url = "https://github.com/gzt/"
+    url = "https://github.com/rstudio/blogdown"
 [[menu.main]]
     name = "Twitter"
-    url = "https://twitter.com/gztstatistics"
-[[menu.main]]
-    name = "LinkedIn"
-    url = "https://www.linkedin.com/in/geoffreyzthompson"
+    url = "https://twitter.com/rstudio"
 
 [params]
-    description = "G.Z. Thompson and some of his statistical and other work."
+    description = "A website built through Hugo and blogdown."
 
     # options for highlight.js (version, additional languages, and theme)
     highlightjsVersion = "9.12.0"
@@ -38,7 +35,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     favicon = "favicon.ico"
 
     [params.logo]
-    url = "../2553342.jpg"
+    url = "logo.png"
     width = 50
     height = 50
     alt = "Logo"

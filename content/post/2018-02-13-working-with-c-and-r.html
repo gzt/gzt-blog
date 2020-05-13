@@ -48,13 +48,13 @@ tags:
 <p>By the way, here is what a minimal R function without error checking looks like (you should validate the input):</p>
 <pre class="r"><code>rCholWishart &lt;- function(n, df, Sigma){
   Sigma &lt;- as.matrix(Sigma)
-  .Call(&quot;rCholWishart&quot;, n, df, Sigma, PACKAGE = &quot;matrixdist&quot;)
+  .Call(&quot;rCholWishart&quot;, n, df, Sigma, PACKAGE = &quot;MixMatrix&quot;)
 }</code></pre>
-<p>Here is what <a href="https://github.com/gzt/matrixdist/blob/master/src/rCholWishart.c">my C file</a> looks like. At this point, you should confirm that your package builds without errors and you can call your C function from the R wrapper function in your package. It should warn about registration. The part that seems a little underdocumented and gave me the most trouble is the registration part.</p>
-<p>I beat myself up for a few hours trying to create my own registration routine by hand based on examples elsewhere. Most people aren’t giving examples of registering multiple functions with <code>R_CallMethodDef</code> and <code>R_registerRoutines</code> so trying to imitate them is fraught with danger. It turns out there’s a handy function to generate the necessary code: <code>tools::package_native_routine_registration_skeleton()</code> - be sure to specify an argument for <code>con=&quot;&quot;</code> other than <code>stdout()</code>. I made the file into <code>init.c</code> and put it in the <code>src/</code> folder. That does it if you have everything else all ready - the functions, the documentation, etc.</p>
+<p>Here is what <a href="https://github.com/gzt/MixMatrix/blob/master/src/rCholWishart.c">my C file</a> looks like. At this point, you should confirm that your package builds without errors and you can call your C function from the R wrapper function in your package. It should warn about registration. The part that seems a little underdocumented and gave me the most trouble is the registration part.</p>
+<p>I beat myself up for a few hours trying to create my own registration routine by hand based on examples elsewhere. Most people aren’t giving examples of registering multiple functions with <code>R_CallMethodDef</code> and <code>R_registerRoutines</code> so trying to imitate them is fraught with danger. It turns out there’s a handy function to generate the necessary code: <code>tools::package_native_routine_registration_skeleton()</code> - be sure to specify an argument for <code>con=""</code> other than <code>stdout()</code>. I made the file into <code>init.c</code> and put it in the <code>src/</code> folder. That does it if you have everything else all ready - the functions, the documentation, etc.</p>
 <p>The final step is making sure you included a <code>.onUnload()</code> function properly in your code. Simply put, somewhere in your code, add this (change to the name of your package):</p>
 <pre class="r"><code>.onUnload &lt;- function(libpath) {
- library.dynam.unload(&quot;matrixdist&quot;, libpath)
+ library.dynam.unload(&quot;MixMatrix&quot;, libpath)
 }</code></pre>
 <p>Maybe there’s a better way of doing that. Nobody seems to say what, though.</p>
 <p>## Conclusion</p>

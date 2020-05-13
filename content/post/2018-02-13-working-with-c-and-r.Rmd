@@ -67,11 +67,11 @@ By the way, here is what a minimal R function without error checking looks like 
 ```{r showsecond, eval=FALSE}
 rCholWishart <- function(n, df, Sigma){
   Sigma <- as.matrix(Sigma)
-  .Call("rCholWishart", n, df, Sigma, PACKAGE = "matrixdist")
+  .Call("rCholWishart", n, df, Sigma, PACKAGE = "MixMatrix")
 }
 ```
 
-Here is what [my C file](https://github.com/gzt/matrixdist/blob/master/src/rCholWishart.c) looks like. At this point, you should confirm that your package builds without errors and you can call your C function from the R wrapper function in your package. It should warn about registration. The part that seems a little underdocumented and gave me the most trouble is the registration part. 
+Here is what [my C file](https://github.com/gzt/MixMatrix/blob/master/src/rCholWishart.c) looks like. At this point, you should confirm that your package builds without errors and you can call your C function from the R wrapper function in your package. It should warn about registration. The part that seems a little underdocumented and gave me the most trouble is the registration part. 
 
 I beat myself up for a few hours trying to create my own registration routine by hand based on examples elsewhere. Most people aren't giving examples of registering multiple functions with `R_CallMethodDef` and `R_registerRoutines` so trying to imitate them is fraught with danger. It turns out there's a handy function to generate the necessary code: `tools::package_native_routine_registration_skeleton()` - be sure to specify an argument for `con=""` other than `stdout()`. I made the file into `init.c` and put it in the `src/` folder. That does it if you have everything else all ready - the functions, the documentation, etc. 
  
@@ -80,7 +80,7 @@ I beat myself up for a few hours trying to create my own registration routine by
  ```{r unload, eval=F}
  
 .onUnload <- function(libpath) {
-  library.dynam.unload("matrixdist", libpath)
+  library.dynam.unload("MixMatrix", libpath)
 }
  
  ```

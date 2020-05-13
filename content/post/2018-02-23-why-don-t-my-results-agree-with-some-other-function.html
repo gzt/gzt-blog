@@ -14,7 +14,7 @@ tags:
 
 <p>Or even with other functions in the same package? With a set seed, one would expect the random draws from
 two equivalent distributions to be the same.</p>
-<pre class="r"><code>library(&#39;matrixdist&#39;)
+<pre class="r"><code>library(&#39;MixMatrix&#39;)
 set.seed(20180223)
 rmatrixnorm(n = 1, mean = matrix(0, nrow = 1, ncol = 5), array = T)</code></pre>
 <pre><code>## , , 1
@@ -95,13 +95,14 @@ A &lt;- rmatrixt(500, df = 5, mean = matrix(0, nrow = 20, ncol = 2))
 )
 print(res)</code></pre>
 <pre><code>## Unit: milliseconds
-##                                                               expr
-##  A &lt;- rmatrixt(500, df = 5, mean = matrix(0, nrow = 2, ncol = 20))
-##  A &lt;- rmatrixt(500, df = 5, mean = matrix(0, nrow = 20, ncol = 2))
-##        min        lq     mean   median        uq      max neval
-##   8.142352  8.283564  8.54300  8.37986  8.478347 12.59635   100
-##  26.059652 26.761277 28.03682 26.89072 28.455555 39.65610   100</code></pre>
+##                                                               expr       min
+##  A &lt;- rmatrixt(500, df = 5, mean = matrix(0, nrow = 2, ncol = 20))  7.064598
+##  A &lt;- rmatrixt(500, df = 5, mean = matrix(0, nrow = 20, ncol = 2)) 20.527809
+##         lq      mean    median        uq      max neval
+##   7.208044  8.205559  7.382543  8.432845 13.62678   100
+##  20.743099 21.985216 21.060493 22.251205 35.50845   100</code></pre>
 <pre class="r"><code>library(&#39;ggplot2&#39;)
 autoplot(res) + theme_bw()</code></pre>
+<pre><code>## Coordinate system already present. Adding new coordinate system, which will replace the existing one.</code></pre>
 <p><img src="/post/2018-02-23-why-don-t-my-results-agree-with-some-other-function_files/figure-html/benchmark-1.png" width="672" /></p>
 </div>

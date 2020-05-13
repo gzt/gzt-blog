@@ -14,8 +14,8 @@ Or even with other functions in the same package? With a set seed, one would exp
 two equivalent distributions to be the same.
 
 
-```{r thesetup}
-library('matrixdist')
+```{r thesetup, cache = TRUE}
+library('MixMatrix')
 set.seed(20180223)
 rmatrixnorm(n = 1, mean = matrix(0, nrow = 1, ncol = 5), array = T)
 set.seed(20180223)
@@ -26,7 +26,7 @@ rnorm(5)
 ```
 However, this breaks when we try it with the $t$-distribution.
 
-```{r theproblem}
+```{r theproblem, cache = TRUE}
 set.seed(20180223)
 rmatrixt(n = 1, df = 5, mean = matrix(0, nrow = 1, ncol = 5))
 set.seed(20180223)
@@ -38,7 +38,7 @@ What is going on here?
 
 It is not because the densities are calculated differently or the distributions are different.
 
-```{r density, cache=TRUE}
+```{r density, cache = TRUE}
 x = matrix(1, nrow=5, ncol=1)
 dmatrixt(x, df = 5)
 dmatrixt(t(x), df = 5)
@@ -50,7 +50,7 @@ var(B)
 
 In fact, if we look at `rmvt` from the excellent `mvtnorm` package, we can see that one of them agrees with their function.
 
-```{r rmvt}
+```{r rmvt, cache = TRUE}
 library('mvtnorm')
 set.seed(20180223)
 rmatrixt(n = 1, df = 5, mean = matrix(0, nrow = 1, ncol = 5))
@@ -72,7 +72,7 @@ This is essentially what happens in `rmatrixt` as well when the dimension of $U$
 
 However, when the dimension ($p$) of $U$ is larger than $1$, the multiplicative factor is not the same, it is  the Cholesky factor of an inverse Wishart draw of dimension $p$, which involves drawing $p$ `rchisq` and `choose(p, 2)-p` draws from `rnorm`. The densities end up the same but the computation involves such different numbers there is no hope of getting the same numbers. Further, this suggests that, when drawing from matrix variate $t$-distributions, given that $X$ and $X'$ have the same distributions, care should be taken so that the faster direction for simulation is used.
 
-```{r benchmark, cache=TRUE}
+```{r benchmark, cache = TRUE}
 library('microbenchmark')
 res <- microbenchmark(
 A <- rmatrixt(500, df = 5, mean = matrix(0, nrow = 2, ncol = 20)),

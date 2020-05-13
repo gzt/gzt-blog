@@ -8,7 +8,7 @@ categories:
 tags:
   - matrix variate
   - classification
-  - matrixdist
+  - MixMatrix
 ---
 
 
@@ -21,7 +21,7 @@ data frames or the formula interface directly, which is reasonable, as there is 
 clear way to make that work for a collection of matrices - anybody using it would have to roll their own
 solutions anyway).</p>
 <pre class="r"><code>set.seed(20180222)
-library(&#39;matrixdist&#39;)
+library(&#39;MixMatrix&#39;)
 A &lt;- rmatrixnorm(30, mean = matrix(0, nrow=2, ncol=3))
 B &lt;- rmatrixnorm(30, mean = matrix(c(1,0), nrow=2, ncol=3))
 C &lt;- rmatrixnorm(30, mean = matrix(c(0,1), nrow=2, ncol=3))
@@ -61,29 +61,29 @@ provided, it will attempt to run it on the original data if it is available in t
 ## Levels: A B C
 ## 
 ## $posterior
-##           [,1]        [,2]       [,3]
-## [1,] 0.2848957 0.676956971 0.03814737
-## [2,] 0.0368267 0.951800210 0.01137309
-## [3,] 0.5314847 0.001123022 0.46739225</code></pre>
+##            [,1]        [,2]       [,3]
+## [1,] 0.27340107 0.690217317 0.03638161
+## [2,] 0.03833953 0.949049289 0.01261118
+## [3,] 0.54647035 0.001273576 0.45225607</code></pre>
 <pre class="r"><code>predict(matqda,  ABC[,,c(1,31,61)])</code></pre>
 <pre><code>## $class
 ## [1] B B A
 ## Levels: A B C
 ## 
 ## $posterior
-##           [,1]        [,2]       [,3]
-## [1,] 0.2502014 0.726688139 0.02311051
-## [2,] 0.0342978 0.961948479 0.00375372
-## [3,] 0.5318650 0.007353527 0.46078146</code></pre>
+##            [,1]        [,2]       [,3]
+## [1,] 0.24302341 0.735815885 0.02116070
+## [2,] 0.03295848 0.963641160 0.00340036
+## [3,] 0.54611977 0.007871269 0.44600896</code></pre>
 <p>In this example, points from classes A, B, and C were selected and they ended up being classifed as B, B, and A. The QDA and LDA rules had only minor disagreements, which is to be expected when they do truly have the same covariances.</p>
 <div id="mathematical-detail" class="section level2">
 <h2>Mathematical detail</h2>
 <p>The factor <span class="math inline">\(R\)</span> for each group <span class="math inline">\(g\)</span> in a QDA setting is:</p>
-<span class="math display">\[\begin{eqnarray} 
+<p><span class="math display">\[\begin{eqnarray} 
 R_g(\mathbf{X}) &amp; = &amp; \mathrm{trace}\big[ -\frac{1}{2}(\mathbf{V}_g^{-1} \mathbf{X}^{T} \mathbf{U}_g^{-1} \mathbf{X}  +(\mathbf{V}_g^{-1} \mathbf{M}_g^{T} \mathbf{U}_g^{-1}) \mathbf{X}  -\frac{1}{2}(\mathbf{V}_g^{-1} \mathbf{M}_g^{T} \mathbf{U}_g^{-1} \mathbf{M}_g)  \big]   \\ 
  &amp;  &amp; -\frac{1}{2}(p (\log|\mathbf{U}_g|)+ n(\log|\mathbf{V}_g|) )  + \log p_g 
 \end{eqnarray}\]</span>
-<p>When <span class="math inline">\(U_i = U_j\)</span> for all groups <span class="math inline">\(i,j\)</span>, several of these terms cancel. The posterior probability is:</p>
+When <span class="math inline">\(U_i = U_j\)</span> for all groups <span class="math inline">\(i,j\)</span>, several of these terms cancel. The posterior probability is:</p>
 <p><span class="math display">\[ P(\mathbf{X} \in g) = \frac{ \exp (R_g (\mathbf{X}))}{\sum_i \exp (R_i(\mathbf{X}))} \]</span>
 with the bottom sum being over all groups <span class="math inline">\(i\)</span>.</p>
 </div>

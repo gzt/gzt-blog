@@ -12,40 +12,43 @@ tags:
 
 
 
-<p>I have just finished setting up handling for AR(1) and compound symmetry variance structures in my maximum likelihood estimation function for matrix variate normal distributions in <code>matrixdist</code>. This means I may submit it to CRAN soon (it’s currently available on <a href="http://www.github.com/gzt/matrixdist">github</a>). An example:</p>
-<pre class="r"><code>library(matrixdist)
+<p>I have just finished setting up handling for AR(1) and compound symmetry variance structures in my maximum likelihood estimation function for matrix variate normal distributions in <code>matrixdist</code>. This means I may submit it to CRAN soon (it’s currently available on <a href="http://www.github.com/gzt/MixMatrix">github</a>). An example:</p>
+<pre class="r"><code>library(MixMatrix)
 A &lt;- rmatrixnorm(100, mean=array(0,dim=c(3,4)), U = toeplitz(c(1,.8,.64)), V = rWishart(1,7,diag(4))[,,1])
 MLmatrixnorm(A, row.variance=&quot;AR(1)&quot;)</code></pre>
 <pre><code>$mean
-           [,1]       [,2]        [,3]      [,4]
-[1,] 0.07425945 -0.1277509 -0.15602140 0.5687155
-[2,] 0.09761592 -0.1253225 -0.10766017 0.2535468
-[3,] 0.13562486 -0.2465561 -0.06357124 0.2790545
+          [,1]       [,2]      [,3]      [,4]
+[1,] 0.2993834 0.05670813 0.4119235 0.2035769
+[2,] 0.3010836 0.06080098 0.2285708 0.1158808
+[3,] 0.1447031 0.17038166 0.2758068 0.2638911
 
 $U
-          [,1]      [,2]      [,3]
-[1,] 1.0000000 0.7915968 0.6266255
-[2,] 0.7915968 1.0000000 0.7915968
-[3,] 0.6266255 0.7915968 1.0000000
+          [,1]     [,2]      [,3]
+[1,] 1.0000000 0.770081 0.5930248
+[2,] 0.7700810 1.000000 0.7700810
+[3,] 0.5930248 0.770081 1.0000000
 
 $V
-           [,1]      [,2]       [,3]       [,4]
-[1,]  1.0000000 -1.214127 -0.3779589  1.2365371
-[2,] -1.2141270  1.825120  0.5151700 -1.3393436
-[3,] -0.3779589  0.515170  0.3699613 -0.5547584
-[4,]  1.2365371 -1.339344 -0.5547584  4.9947452
+           [,1]      [,2]      [,3]       [,4]
+[1,]  1.0000000 0.1671565 0.4472189 -0.4210630
+[2,]  0.1671565 0.6778997 0.2886729  0.2235859
+[3,]  0.4472189 0.2886729 0.8673512  0.3561256
+[4,] -0.4210630 0.2235859 0.3561256  1.1370033
 
 $var
-[1] 3.237086
+[1] 2.559345
 
 $iter
-[1] 17
+[1] 27
 
 $tol
-[1] 5.677275e-08
+[1] 1.134173e-07
 
 $logLik
-[1] -1808.526
+ [1] -1713.291 -1682.135 -1667.450 -1662.871 -1660.327 -1659.303 -1658.751
+ [8] -1658.501 -1658.369 -1658.307 -1658.275 -1658.259 -1658.251 -1658.247
+[15] -1658.245 -1658.244 -1658.243 -1658.243 -1658.243 -1658.243 -1658.243
+[22] -1658.243 -1658.243 -1658.243 -1658.243 -1658.243 -1658.243
 
 $convergence
 [1] TRUE

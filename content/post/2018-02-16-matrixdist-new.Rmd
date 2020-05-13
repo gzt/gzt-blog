@@ -10,10 +10,10 @@ tags:
   - matrixdist
 ---
 
-I have just finished setting up handling for AR(1) and compound symmetry variance structures in my maximum likelihood estimation function for matrix variate normal distributions in `matrixdist`. This means I may submit it to CRAN soon (it's currently available on [github](http://www.github.com/gzt/matrixdist)).  An example:
+I have just finished setting up handling for AR(1) and compound symmetry variance structures in my maximum likelihood estimation function for matrix variate normal distributions in `matrixdist`. This means I may submit it to CRAN soon (it's currently available on [github](http://www.github.com/gzt/MixMatrix)).  An example:
 
-```{r matrixexample, cache=T, comment=""}
-library(matrixdist)
+```{r matrixexample, cache = TRUE, comment=""}
+library(MixMatrix)
 A <- rmatrixnorm(100, mean=array(0,dim=c(3,4)), U = toeplitz(c(1,.8,.64)), V = rWishart(1,7,diag(4))[,,1])
 MLmatrixnorm(A, row.variance="AR(1)")
 

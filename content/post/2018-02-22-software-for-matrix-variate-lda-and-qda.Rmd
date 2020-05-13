@@ -8,7 +8,7 @@ categories:
 tags:
   - matrix variate
   - classification
-  - matrixdist
+  - MixMatrix
 ---
 
 In the previous post, I had some rough notes on classification of matrix variate data. 
@@ -19,9 +19,9 @@ data frames or the formula interface directly, which is reasonable, as there is 
 clear way to make that work for a collection of matrices - anybody using it would have to roll their own
 solutions anyway).
 
-```{r generatedata, cache=TRUE}
+```{r generatedata}
 set.seed(20180222)
-library('matrixdist')
+library('MixMatrix')
 A <- rmatrixnorm(30, mean = matrix(0, nrow=2, ncol=3))
 B <- rmatrixnorm(30, mean = matrix(c(1,0), nrow=2, ncol=3))
 C <- rmatrixnorm(30, mean = matrix(c(0,1), nrow=2, ncol=3))

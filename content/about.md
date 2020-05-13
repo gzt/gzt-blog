@@ -7,7 +7,7 @@ weight: -210
 ---
 
 I'm Geoff Thompson, a PhD candidate at the Department of Statistics at Iowa State University.
-I should be defending this fall (2019). My research interests have been in clustering
+I should be defending this summer (2020). My research interests have been in clustering
 and other classification problems as well as unsupervised or semisupervised learning.
 But, generally, a lot of aspects of going from large messy real-world data 
 to the truth of what is going on. I work on the "Model" part of 
@@ -24,18 +24,19 @@ I also like long walks on the beach.
 
 ### Awards
 
- * 2014 ASA Statistical Computing Section Student Paper Award
- * 2015 ISU Departmental Award for Excellence in Statistical Computing
- * 2017 ISU Departmental Award for Excellence in Statistical Consulting
+* 2017 ISU Departmental Award for Excellence in Statistical Consulting
+* 2015 ISU Departmental Award for Excellence in Statistical Computing
+* 2014 ASA Statistical Computing Section Student Paper Award
+
  
 ### Projects
  
- * In progress: forensic matching of knife fragments using matrix variate discriminant analysis and some other applications of matrix variate discriminant analysis.
- * `matrixdist` an R package for working with matrix variate distributions such as the matrix variate normal or matrix variate *t*-distribution. On [github](https://www.github.com/gzt/matrixdist).
+ * [Forensic matching of knife fragments using matrix variate discriminant analysis](https://www.tandfonline.com/doi/abs/10.1080/10618600.2019.1696208?journalCode=ucgs20) and some other applications of matrix variate discriminant analysis.
+ * `MixMatrix` an R package for working with matrix variate distributions such as the matrix variate normal or matrix variate *t*-distribution performing discriminant analysis and, soon, clustering. On [github](https://www.github.com/gzt/MixMatrix) and [CRAN](https://cran.r-project.org/package=MixMatrix).
  * `CholWishart` an R package for some distributions and functions related to the Wishart, in particular sampling from the Cholesky factorization of the Wishart and inverse Wishart. On [CRAN](https://cran.r-project.org/package=CholWishart) and [github](https://www.github.com/gzt/CholWishart).
  * Porting [scalable *k*-means++](https://arxiv.org/abs/1203.6402) (or *k*-means||) to OpenMPI (a minor work).
  * A [small C program](https://www.github.com/gzt/replaceR) to replace the use of the Rmath standalone library for random  number generation. 
- * In progress: a [similarity metric](https://www.github.com/gzt/catsim) for binomial and multinomial image comparison accounting for structural similarity, after the model of the MS-SSIM metric.
+ * A [similarity metric](https://www.github.com/gzt/catsim) for binomial and multinomial image comparison accounting for structural similarity, after the model of the MS-SSIM metric. See on [Arxiv](https://arxiv.org/abs/2004.09073) and on [CRAN](https://cran.r-project.org/package=catsim)
  * In progress: a parallelization of Hartigan and Wong's k-means algorithm for OpenMPI.
  * In progress: a clustering-based image compression algorithm - see the 2014 award.
  * In progress: multinomial clustering with covariates.
