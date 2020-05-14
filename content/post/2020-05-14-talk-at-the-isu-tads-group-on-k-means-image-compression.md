@@ -12,4 +12,4 @@ The audio/video may be available soon. I will update this post
 when they are if you really want it, but the talks are somewhat
 informal.
 
-* [Slides for the talk](pdfs/kmeans-data-sci-05142020.pdf)
+* [Slides for the talk](../../../../pdfs/kmeans-data-sci-05142020.pdf)
