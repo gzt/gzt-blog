@@ -9,6 +9,11 @@ weight: -210
 I'm Geoff Thompson, a PhD candidate at the Department of Statistics at Iowa State University.
 I should be defending this summer (2020). My research interests have been in clustering
 and other classification problems as well as unsupervised or semisupervised learning.
+I have also worked in the statistical consulting group as the university in addition to my research.
+You can see my software on my [github](https://github.com/gzt) and, below, 
+in my list of projects, you can see some of the work i've done.
+
+
 But, generally, a lot of aspects of going from large messy real-world data 
 to the truth of what is going on. I work on the "Model" part of 
 the "Import, Tidy, Transform, Visualize, and Model Data" formulation of Data Science.
